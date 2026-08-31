@@ -7,28 +7,35 @@ Repository for our CITS3006 Penetration Testing group project.
 | Member | GitHub Username | Responsibilities |
 |---|---|---|
 | Zawad | @zawadhuda | TBD |
-| Member 2 | @username | TBD |
-| Member 3 | @username | TBD |
-| Member 4 | @username | TBD |
+| Michael Ang | TBD | TBD |
+| Dhava Wikhananda Adhi | TBD | TBD |
+| Hamish Haslam | TBD | TBD |
+| Yashwardhan | TBD | TBD |
+
+## Project Overview
+
+This repository contains the source code, scripts, testing material,
+technical documentation, and supporting evidence for our CITS3006
+group project.
 
 ## Repository Structure
 
 - `src/` - Main project source code
-- `scripts/` - Supporting scripts and tools
+- `scripts/` - Supporting scripts and utilities
 - `tests/` - Testing code and test data
-- `docs/` - Technical documentation
-- `evidence/` - Screenshots and supporting evidence
+- `docs/` - Technical documentation and design notes
+- `evidence/` - Screenshots and supporting project evidence
 
 ## Team Workflow
 
-1. Create a GitHub Issue for a task.
+1. Create a GitHub Issue for each task.
 2. Assign the Issue to a team member.
-3. Create a branch for the task.
+3. Create a branch from `main`.
 4. Complete the work on that branch.
 5. Commit and push the changes.
 6. Open a Pull Request.
 7. Another team member reviews the Pull Request.
-8. Merge the Pull Request into `main`.
+8. Merge the approved Pull Request into `main`.
 
 ## Branch Naming
 
@@ -47,6 +54,14 @@ Examples:
 - `docs: update project documentation`
 - `test: add task 1 tests`
 
+## Project Management
+
+Development tasks are tracked using GitHub Issues and the GitHub Project board.
+
+Formal documentation, meeting notes, reports, research, and presentation
+material are stored in the team's shared Google Drive.
+
 ## Important
 
-All penetration testing activities must only be performed against systems and targets authorised for the CITS3006 project.
+All penetration-testing activities must only be performed against systems
+and targets authorised for the CITS3006 project.
