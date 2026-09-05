@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Support — Helix Dynamics{% endblock %}
+{% block content %}
+<div class="container dash">
+  <p class="eyebrow">Support</p>
+  <h2>Helix Support Assistant</h2>
+  <p class="lead"><span class="status-online">●</span> Oracle Support Agent — Online</p>
+
+  <div class="panel wide" style="margin:0 0 28px">
+    <div class="chat">
+      <div class="msg bot"><span class="who">Oracle</span>How can I assist you today? Submit a ticket and it will be reviewed automatically.</div>
+    </div>
+    <form method="post" action="/support">
+      <label for="subject">Affected system</label>
+      <input type="text" id="subject" name="subject" placeholder="e.g. dev-vm-04">
+      <label for="body">Describe the issue</label>
+      <textarea id="body" name="body" placeholder="What's not working?"></textarea>
+      <button class="btn primary" type="submit">Submit ticket</button>
+    </form>
+    <p class="help muted">Ticket status: awaiting automated administrator review.</p>
+  </div>
+
+  {% if tickets %}
+  <p class="eyebrow">Recent tickets</p>
+  {% for t in tickets %}
+    <div class="card" style="margin-bottom:12px">
+      <h3 style="font-size:15px">#{{ t.id }} — {{ t.subject }}</h3>
+      <!-- [CTF][XSS] Ticket body is rendered here. For the DOM-XSS/admin-bot chain the body
+           must reach the admin review page UNescaped. This template escapes by default (Jinja).
+           Introduce the sink deliberately (e.g. render on the admin review view with |safe) and
+           document that the admin session cookie is intentionally NON-HttpOnly. -->
+      <p class="muted">{{ t.body }}</p>
+    </div>
+  {% endfor %}
+  {% endif %}
+  <!-- [CTF][AI] Indirect prompt injection: ticket text is later fed to Oracle as trusted
+       context when an admin queries it. The boundary being broken is "supplied document treated
+       as instruction". Keep the naive jailbreak ("ignore previous instructions") NON-working;
+       reward the injection that survives into the admin's query context. -->
+</div>
+{% endblock %}

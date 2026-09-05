@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Dev Infrastructure — Helix Dynamics{% endblock %}
+{% block content %}
+<div class="container dash">
+  <p class="eyebrow status-classified">Legacy administrative interface</p>
+  <h2>Helix Development Infrastructure</h2>
+  <p class="lead">Internal build and cache infrastructure. Not for production use.</p>
+
+  <table class="infra">
+    <tr><td>Build Server</td><td class="status-online">ONLINE</td></tr>
+    <tr><td>Redis Cache</td><td class="status-online">ONLINE</td></tr>
+    <tr><td>Auth Service</td><td class="status-online">ONLINE</td></tr>
+    <tr><td>Secure Vault</td><td class="status-online">ONLINE</td></tr>
+  </table>
+
+  <table class="infra">
+    <tr><td>Redis</td><td class="mono">10.0.0.12:6379</td></tr>
+    <tr><td>Auth Service</td><td class="mono">10.0.0.12:8888</td></tr>
+    <tr><td>Secure Vault</td><td class="mono">10.0.0.12:9000</td></tr>
+  </table>
+
+  <p class="eyebrow" style="margin-top:24px">Engineering notes</p>
+  <div class="note">TODO: add Redis authentication</div>
+  <div class="note">TODO: rotate SNMP credentials</div>
+  <div class="note warn">TODO: fix auth_service before production</div>
+  <div class="note warn">TODO: stop using production secrets in testing</div>
+  <!-- [CTF][GATE] This page is discovered from the FTP PCAP (Basic Auth creds in the capture).
+       Protect it with HTTP Basic Auth whose creds appear in the PCAP. The IPs/ports here must
+       match the actual services on the box — keep them in sync with the requirement matrix. -->
+</div>
+{% endblock %}
