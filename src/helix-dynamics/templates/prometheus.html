@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="panel">
+  <h1 class="status-classified">403 — Not authorised</h1>
+  <p class="sub">You are not authorised to access Project Prometheus.</p>
+  <p class="mono muted">Incident ID: PRM-403-9182</p>
+  <!-- [CTF][CLUE] Incident ID can gate a later step (e.g. Basic Auth realm hint, ticket ref,
+       or the value expected by an internal endpoint). Decide what it unlocks and record it in
+       the requirement matrix so it isn't a dead-end clue. -->
+</div>
+{% endblock %}

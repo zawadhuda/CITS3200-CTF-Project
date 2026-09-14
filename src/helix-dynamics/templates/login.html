@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Employee Access — Helix Dynamics{% endblock %}
+{% block content %}
+<div class="panel">
+  <h1>Helix Employee Access</h1>
+  <p class="sub">Legacy internal portal. Migration pending.</p>
+  <form method="post" action="/login">
+    <label for="email">Corporate email</label>
+    <input type="text" id="email" name="email" autocomplete="off" placeholder="name@helix.local">
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password">
+    <button class="btn primary" type="submit">Sign in</button>
+  </form>
+  <p class="help">Having trouble? Contact <a href="/support">Helix IT Support</a>.</p>
+</div>
+{% endblock %}

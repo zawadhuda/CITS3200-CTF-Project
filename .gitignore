@@ -26,3 +26,6 @@ Thumbs.db
 # Build/output
 build/
 dist/
+
+# Helix Dynamics CTF app runtime data
+src/helix-dynamics/helix.db

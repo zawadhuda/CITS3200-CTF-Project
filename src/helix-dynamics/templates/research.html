@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<section>
+  <div class="container">
+    <p class="eyebrow">Research</p>
+    <h2>Active programs</h2>
+    <p class="lead">A selection of the work we are able to disclose publicly.</p>
+    <div class="grid two">
+      <div class="card">
+        <h3>Project Oracle</h3>
+        <p>AI-assisted infrastructure management. Oracle combines natural-language
+           interaction with automated infrastructure operations.</p>
+        <span class="tag">Helix AI</span>
+      </div>
+      <div class="card">
+        <h3>Project Vault</h3>
+        <p>Secure document storage. Advanced cryptographic storage for sensitive
+           research materials.</p>
+        <span class="tag">Cryptography</span>
+      </div>
+      <div class="card">
+        <h3>Project Sentinel</h3>
+        <p>Internal service discovery and automated health monitoring across all
+           Helix research environments.</p>
+        <span class="tag">Monitoring</span>
+      </div>
+      <div class="card classified">
+        <h3>Project Prometheus</h3>
+        <p>Experimental compute platform.</p>
+        <span class="tag">Classified</span>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

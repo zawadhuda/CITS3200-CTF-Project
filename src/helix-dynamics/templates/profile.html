@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Profile — Helix Dynamics{% endblock %}
+{% block content %}
+<div class="panel wide">
+  <h1>Employee profile</h1>
+  <p class="sub">{{ user.name }} · {{ user.title }}</p>
+
+  <p class="eyebrow" style="margin-top:24px">Export profile</p>
+  <p class="muted" style="font-size:14px">Download a Helix Profile Package (.hpf) backup of your settings.</p>
+  <a class="btn ghost" href="/profile/export">Download .hpf</a>
+
+  <p class="eyebrow" style="margin-top:28px">Import profile</p>
+  <form method="post" action="/profile/import" enctype="multipart/form-data">
+    <input type="file" name="profile" accept=".hpf">
+    <button class="btn primary" type="submit">Import</button>
+  </form>
+  <p class="help muted">Accepted format: Helix Profile Package (.hpf)</p>
+  <!-- [CTF][DESERIALIZATION] The .hpf import is your insecure-deserialization sink.
+       DECIDE the format explicitly (pickle / PHP object / Java) and write it into the matrix.
+       Do NOT wire a live deserializer here yet — this frontend only accepts the upload.
+       When you build the sink, keep it sandboxed to the CTF VM and note the exact object that
+       triggers execution so the group can explain it live. -->
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<section>
+  <div class="container">
+    <p class="eyebrow">Company</p>
+    <h2>About Helix Dynamics</h2>
+    <p class="lead">Founded in 2019, Helix Dynamics is an advanced research and development
+       company specialising in autonomous systems, secure infrastructure, applied AI and
+       experimental computing. We are headquartered in Perth with a satellite office we are
+       contractually unable to name.</p>
+
+    <p class="eyebrow" style="margin-top:40px">Leadership &amp; Research Staff</p>
+    <div class="grid">
+      <div class="card"><h3>Dr. Alice Morgan</h3><p>Research Engineer — Advanced Systems Division</p><p class="mono muted" style="margin-top:8px">alice.morgan@helix.local</p></div>
+      <div class="card"><h3>Bob Nkemdirim</h3><p>Infrastructure Engineer — Platform</p><p class="mono muted" style="margin-top:8px">bob.nkemdirim@helix.local</p></div>
+      <div class="card"><h3>Charlie Voss</h3><p>Systems Analyst — Sentinel</p><p class="mono muted" style="margin-top:8px">charlie.voss@helix.local</p></div>
+    </div>
+    <!-- [CTF][RECON] Staff emails seed the username list for /login brute/SQLi and horizontal moves.
+         Keep the naming convention consistent with the accounts you provision on the box. -->
+  </div>
+</section>
+{% endblock %}
