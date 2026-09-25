@@ -1,12 +1,11 @@
 """
-Helix Dynamics — CITS3006 CTF target application (frontend + safe scaffold).
+Helix Dynamics — CITS3006 CTF target application.
 
-This is the BENIGN target app. It is safe by default: parameterised queries,
-Jinja auto-escaping, no live deserializer. Each intended vulnerability has a
-[CTF] hook marked in the code/templates. Inject the actual weaknesses yourself
-so your group understands and can explain every one live (a grading criterion).
+The student-owned challenge hooks are W2 profile deserialisation, W3 stored
+DOM XSS in administrator ticket review, and A1 support-ticket prompt injection.
+Run this version only in the isolated CTF VM.
 
-Run:
+Run (CTF VM):
     pip install flask
     python3 app.py
     # http://127.0.0.1:5000
@@ -14,15 +13,21 @@ Run:
 import base64
 import json
 import os
+import pickle
+import secrets
 import sqlite3
 from functools import wraps
 
-from flask import (Flask, flash, redirect, render_template, request,
+from flask import (Flask, flash, jsonify, redirect, render_template, request,
                    session, url_for, Response, abort)
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("HELIX_SECRET", "dev-only-change-me")
 DB = os.path.join(os.path.dirname(__file__), "helix.db")
+MAX_PROFILE_BYTES = 64 * 1024
+REVIEW_KEY = os.environ.get("HELIX_REVIEW_KEY", "development-review-key")
+ORACLE_WORKER_KEY = os.environ.get(
+    "HELIX_ORACLE_WORKER_KEY", "development-oracle-key")
 
 # --- Basic Auth creds for the hidden dev page (creds should also appear in your FTP PCAP) ---
 DEV_USER = "devops"
@@ -43,8 +48,26 @@ def init_db():
             email TEXT UNIQUE, password TEXT,
             name TEXT, title TEXT, clearance TEXT);
         CREATE TABLE IF NOT EXISTS tickets(
-            id INTEGER PRIMARY KEY, subject TEXT, body TEXT);
+            id INTEGER PRIMARY KEY, subject TEXT, body TEXT,
+            reviewed INTEGER DEFAULT 0,
+            oracle_processed INTEGER DEFAULT 0,
+            oracle_reply TEXT DEFAULT '');
+        CREATE TABLE IF NOT EXISTS xss_reports(
+            ticket_id INTEGER PRIMARY KEY,
+            captured_data TEXT,
+            FOREIGN KEY(ticket_id) REFERENCES tickets(id));
         """)
+        # The supplied VM has an older database, so add the challenge columns
+        # without deleting the existing tickets.
+        columns = {row["name"] for row in c.execute(
+            "PRAGMA table_info(tickets)").fetchall()}
+        if "reviewed" not in columns:
+            c.execute("ALTER TABLE tickets ADD COLUMN reviewed INTEGER DEFAULT 0")
+        if "oracle_processed" not in columns:
+            c.execute(
+                "ALTER TABLE tickets ADD COLUMN oracle_processed INTEGER DEFAULT 0")
+        if "oracle_reply" not in columns:
+            c.execute("ALTER TABLE tickets ADD COLUMN oracle_reply TEXT DEFAULT ''")
         cur = c.execute("SELECT COUNT(*) n FROM employees").fetchone()
         if cur["n"] == 0:
             c.executemany(
@@ -138,13 +161,120 @@ def dashboard():
 def support():
     if request.method == "POST":
         with db() as c:
-            c.execute("INSERT INTO tickets(subject,body) VALUES(?,?)",
-                      (request.form.get("subject", ""), request.form.get("body", "")))
+            cursor = c.execute(
+                "INSERT INTO tickets(subject,body) VALUES(?,?)",
+                (request.form.get("subject", "")[:200],
+                 request.form.get("body", "")[:10000]))
+            ticket_id = cursor.lastrowid
         flash("Ticket submitted. Awaiting automated administrator review.", "ok")
-        return redirect(url_for("support"))
+        return redirect(url_for("support_ticket", ticket_id=ticket_id))
     with db() as c:
         tickets = c.execute("SELECT * FROM tickets ORDER BY id DESC LIMIT 10").fetchall()
     return render_template("support.html", tickets=tickets)
+
+
+@app.route("/support/ticket/<int:ticket_id>")
+def support_ticket(ticket_id):
+    with db() as c:
+        ticket = c.execute(
+            "SELECT * FROM tickets WHERE id=?", (ticket_id,)).fetchone()
+        report = c.execute(
+            "SELECT captured_data FROM xss_reports WHERE ticket_id=?",
+            (ticket_id,)).fetchone()
+    if ticket is None:
+        abort(404)
+    return render_template("support_ticket.html", ticket=ticket, report=report)
+
+
+@app.route("/support/collect/<int:ticket_id>")
+def collect_browser_report(ticket_id):
+    """Same-origin collection point used by the W3 browser payload."""
+    captured = request.args.get("data", "")[:4096]
+    with db() as c:
+        exists = c.execute(
+            "SELECT 1 FROM tickets WHERE id=?", (ticket_id,)).fetchone()
+        if exists is None:
+            abort(404)
+        c.execute(
+            "INSERT OR REPLACE INTO xss_reports(ticket_id,captured_data)"
+            " VALUES(?,?)", (ticket_id, captured))
+    return ("recorded", 200)
+
+
+def valid_internal_key(provided, expected):
+    return bool(provided) and secrets.compare_digest(provided, expected)
+
+
+@app.route("/internal/next-ticket")
+def internal_next_ticket():
+    if not valid_internal_key(request.args.get("key"), REVIEW_KEY):
+        abort(403)
+    with db() as c:
+        ticket = c.execute(
+            "SELECT id FROM tickets WHERE reviewed=0 ORDER BY id LIMIT 1"
+        ).fetchone()
+    return jsonify({"ticket_id": ticket["id"] if ticket else None})
+
+
+@app.route("/internal/review/<int:ticket_id>")
+def internal_review(ticket_id):
+    if not valid_internal_key(request.args.get("key"), REVIEW_KEY):
+        abort(403)
+    with db() as c:
+        exists = c.execute(
+            "SELECT 1 FROM tickets WHERE id=?", (ticket_id,)).fetchone()
+    if exists is None:
+        abort(404)
+    return render_template(
+        "admin_review.html", ticket_id=ticket_id, review_key=REVIEW_KEY)
+
+
+@app.route("/internal/ticket-data/<int:ticket_id>")
+def internal_ticket_data(ticket_id):
+    if not valid_internal_key(request.args.get("key"), REVIEW_KEY):
+        abort(403)
+    with db() as c:
+        ticket = c.execute(
+            "SELECT id,subject,body FROM tickets WHERE id=?", (ticket_id,)
+        ).fetchone()
+    if ticket is None:
+        abort(404)
+    return jsonify(dict(ticket))
+
+
+@app.route("/internal/mark-reviewed/<int:ticket_id>", methods=["POST"])
+def internal_mark_reviewed(ticket_id):
+    if not valid_internal_key(request.args.get("key"), REVIEW_KEY):
+        abort(403)
+    with db() as c:
+        c.execute("UPDATE tickets SET reviewed=1 WHERE id=?", (ticket_id,))
+    return jsonify({"ok": True})
+
+
+@app.route("/internal/oracle-next")
+def internal_oracle_next():
+    if not valid_internal_key(request.args.get("key"), ORACLE_WORKER_KEY):
+        abort(403)
+    with db() as c:
+        ticket = c.execute(
+            "SELECT id,subject,body FROM tickets WHERE oracle_processed=0"
+            " ORDER BY id LIMIT 1"
+        ).fetchone()
+    return jsonify(dict(ticket) if ticket else {"ticket_id": None})
+
+
+@app.route("/internal/oracle-reply/<int:ticket_id>", methods=["POST"])
+def internal_oracle_reply(ticket_id):
+    if not valid_internal_key(request.args.get("key"), ORACLE_WORKER_KEY):
+        abort(403)
+    reply = request.get_json(silent=True) or {}
+    with db() as c:
+        cursor = c.execute(
+            "UPDATE tickets SET oracle_reply=?, oracle_processed=1 WHERE id=?",
+            (str(reply.get("reply", ""))[:10000], ticket_id))
+    if cursor.rowcount == 0:
+        abort(404)
+    return jsonify({"ok": True})
 
 
 # ---------- Profile ----------
@@ -158,13 +288,27 @@ def profile():
 @login_required
 def profile_export():
     u = current_user()
-    # SAFE, portable .hpf = base64(JSON). If you choose deserialization as your web vuln,
-    # swap the *import* side to your chosen format (pickle/PHP/Java) — see profile_import.
+    # Save the profile as a Python object, then Base64-encode it for the .hpf file.
     payload = {"email": u["email"], "name": u["name"],
                "title": u["title"], "clearance": u["clearance"]}
-    blob = base64.b64encode(json.dumps(payload).encode())
+    blob = base64.b64encode(pickle.dumps(payload, protocol=4))
     return Response(blob, mimetype="application/octet-stream",
                     headers={"Content-Disposition": "attachment; filename=profile.hpf"})
+
+
+def load_profile_package(raw):
+    """Decode a Helix profile package.
+
+    Pickle is deliberately used here for the W2 challenge. Loading a pickle from
+    an untrusted upload can run code as the web service account.
+    """
+    decoded = base64.b64decode(raw, validate=True)
+
+    try:
+        return pickle.loads(decoded)
+    except (pickle.UnpicklingError, EOFError, AttributeError, ImportError, IndexError):
+        # Profiles exported by the earlier JSON version still work.
+        return json.loads(decoded.decode("utf-8"))
 
 
 @app.route("/profile/import", methods=["POST"])
@@ -174,13 +318,18 @@ def profile_import():
     if not f:
         flash("No file provided.", "err")
         return redirect(url_for("profile"))
-    # [CTF][DESERIALIZATION] SAFE parse only. Do NOT call pickle.loads / unserialize here in
-    # its current form. When you build the challenge, do it deliberately and sandboxed to the
-    # CTF VM, and record the exact trigger object in your matrix so the group can explain it.
     try:
-        data = json.loads(base64.b64decode(f.read()))
+        raw = f.read(MAX_PROFILE_BYTES + 1)
+        if len(raw) > MAX_PROFILE_BYTES:
+            raise ValueError("Profile package is too large")
+
+        data = load_profile_package(raw)
+        if not isinstance(data, dict):
+            raise ValueError("Profile package did not contain a profile")
+
         flash(f"Imported profile for {data.get('name','?')}.", "ok")
-    except Exception:
+    except (ValueError, TypeError, UnicodeDecodeError, json.JSONDecodeError,
+            pickle.UnpicklingError):
         flash("Invalid .hpf file.", "err")
     return redirect(url_for("profile"))
 

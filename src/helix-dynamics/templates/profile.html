@@ -15,10 +15,6 @@
     <button class="btn primary" type="submit">Import</button>
   </form>
   <p class="help muted">Accepted format: Helix Profile Package (.hpf)</p>
-  <!-- [CTF][DESERIALIZATION] The .hpf import is your insecure-deserialization sink.
-       DECIDE the format explicitly (pickle / PHP object / Java) and write it into the matrix.
-       Do NOT wire a live deserializer here yet — this frontend only accepts the upload.
-       When you build the sink, keep it sandboxed to the CTF VM and note the exact object that
-       triggers execution so the group can explain it live. -->
+  <!-- W2: the server restores .hpf files with Python pickle. -->
 </div>
 {% endblock %}

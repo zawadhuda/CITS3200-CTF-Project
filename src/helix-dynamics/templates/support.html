@@ -24,18 +24,10 @@
   <p class="eyebrow">Recent tickets</p>
   {% for t in tickets %}
     <div class="card" style="margin-bottom:12px">
-      <h3 style="font-size:15px">#{{ t.id }} — {{ t.subject }}</h3>
-      <!-- [CTF][XSS] Ticket body is rendered here. For the DOM-XSS/admin-bot chain the body
-           must reach the admin review page UNescaped. This template escapes by default (Jinja).
-           Introduce the sink deliberately (e.g. render on the admin review view with |safe) and
-           document that the admin session cookie is intentionally NON-HttpOnly. -->
+      <h3 style="font-size:15px"><a href="{{ url_for('support_ticket', ticket_id=t.id) }}">#{{ t.id }} — {{ t.subject }}</a></h3>
       <p class="muted">{{ t.body }}</p>
     </div>
   {% endfor %}
   {% endif %}
-  <!-- [CTF][AI] Indirect prompt injection: ticket text is later fed to Oracle as trusted
-       context when an admin queries it. The boundary being broken is "supplied document treated
-       as instruction". Keep the naive jailbreak ("ignore previous instructions") NON-working;
-       reward the injection that survives into the admin's query context. -->
 </div>
 {% endblock %}
