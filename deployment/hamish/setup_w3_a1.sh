@@ -22,6 +22,8 @@ for user in w3-bot oracle-bot; do
     fi
 done
 
+install -d -o w3-bot -g w3-bot -m 0700 /var/lib/helix-w3-bot
+
 if ! command -v chromium >/dev/null 2>&1 || ! python3 -c 'import selenium' >/dev/null 2>&1; then
     apt-get update
     DEBIAN_FRONTEND=noninteractive apt-get install -y chromium chromium-driver python3-selenium
@@ -77,6 +79,7 @@ Requires=flaskapp.service
 [Service]
 Type=simple
 User=w3-bot
+Environment=HOME=/var/lib/helix-w3-bot
 EnvironmentFile=/etc/helix/w3-bot.env
 ExecStart=/usr/bin/python3 /opt/helix/bots/w3_admin_bot.py
 Restart=always

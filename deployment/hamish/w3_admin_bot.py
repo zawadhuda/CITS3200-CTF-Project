@@ -9,6 +9,7 @@ import urllib.request
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 
 
 BASE_URL = os.environ.get("HELIX_BASE_URL", "http://127.0.0.1:5000").rstrip("/")
@@ -34,8 +35,11 @@ def review_ticket(ticket_id, flag):
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
+    options.add_argument("--user-data-dir=/var/lib/helix-w3-bot/chrome")
+    options.binary_location = "/usr/bin/chromium"
 
-    driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(
+        service=Service("/usr/bin/chromedriver"), options=options)
     try:
         driver.get(BASE_URL + "/")
         # This challenge cookie is readable by JavaScript on purpose.
