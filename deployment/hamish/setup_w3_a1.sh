@@ -24,7 +24,9 @@ done
 
 install -d -o w3-bot -g w3-bot -m 0700 /var/lib/helix-w3-bot
 
-if ! command -v chromium >/dev/null 2>&1 || ! python3 -c 'import selenium' >/dev/null 2>&1; then
+if ! command -v chromium >/dev/null 2>&1 \
+        || ! command -v chromedriver >/dev/null 2>&1 \
+        || ! python3 -c 'import selenium' >/dev/null 2>&1; then
     apt-get update
     DEBIAN_FRONTEND=noninteractive apt-get install -y chromium chromium-driver python3-selenium
 fi
