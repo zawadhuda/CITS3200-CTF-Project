@@ -11,6 +11,19 @@
     <input type="password" id="password" name="password">
     <button class="btn primary" type="submit">Sign in</button>
   </form>
+  {% if searched %}
+  <hr style="margin:20px 0;border:none;border-top:1px solid rgba(255,255,255,.12)">
+  {% if record %}
+  <div class="record">
+    <p class="eyebrow">DIRECTORY RESULT</p>
+    <p><strong>{{ record["name"] }}</strong></p>
+    <p><span class="muted">Email</span> &nbsp; {{ record["email"] }}</p>
+    <p><span class="muted">Password</span> &nbsp; {{ record["title"] }}</p>
+  </div>
+  {% else %}
+  <div class="record"><p class="muted">No matching employee record.</p></div>
+  {% endif %}
+  {% endif %}
   <p class="help">Having trouble? Contact <a href="/support">Helix IT Support</a>.</p>
 </div>
 {% endblock %}
