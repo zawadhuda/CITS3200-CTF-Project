@@ -19,7 +19,8 @@ import secrets
 import sqlite3
 from functools import wraps
 
-from flask import (Flask, flash, jsonify, redirect, render_template, request,
+from flask import (Flask, flash, redirect, render_template, request,
+                   session, url_for, Response, abort)
 ITER = 200_000
 def strong_hash(pw):
     salt = os.urandom(8)
@@ -33,8 +34,6 @@ def strong_verify(pw, stored):
         return False
 FLAG_WEB_SQLI = "helix{websqli}"
 
-from flask import (Flask, flash, redirect, render_template, request,
-                   session, url_for, Response, abort)
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("HELIX_SECRET", "dev-only-change-me")
