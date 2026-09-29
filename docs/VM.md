@@ -14,7 +14,7 @@
 | Auth service (RE) | `helix-auth.service` | `authsvc` | `:8888`, flag in unit `Environment=FLAG` | `challenges/auth_service/setup.sh` |
 | SUID diag (privesc) | — (SUID binary) | root (`4755`) | `/opt/helix/helix-diag`, flag in `/root/root.flag` (`0600`) | `challenges/auth_service/setup.sh` |
 | Secure vault (crypto) | `helix-vault.service` | `vaultsvc` | `:9000`, server `root:vaultsvc` `0750` | `challenges/vault/setup.sh` |
-| Docker network lab | `ctf-network.service` | root (containers) | FTP `:2121`, web `:8080`, ssh `:2222`, redis `:6379`, SNMP `:1610/udp` | compose tree synced to `/opt/network` by hand; unit installed by `setup_vm.sh` |
+| Docker network lab | `ctf-network.service` | root (containers) | FTP `:2121`, web `:8080`, ssh `:2222`, redis `:6379`, SNMP `:1610/udp` — published on all host interfaces, so players use `192.168.56.x:<port>`; the `10.20.30.x` container IPs are internal only | compose tree synced to `/opt/network` by hand; unit installed by `setup_vm.sh` |
 
 Bots `Require=flaskapp.service` and restart after it; auth/vault/docker-lab
 are independent. Everything is reachable immediately after boot — no manual
@@ -71,8 +71,9 @@ flags, and solvers).
 ```sh
 systemctl is-active flaskapp.service helix-w3-bot.service helix-oracle-worker.service helix-auth.service helix-vault.service
 journalctl -u flaskapp.service --no-pager | tail -5   # no traceback, no debugger PIN
-ss -ltn | grep -E ':(5000|8888|9000)'                  # all three listeners
+ss -ltn | grep -E ':(5000|8888|9000|2121|8080|2222|6379|1610)'   # web, services, docker
 # player view: http://192.168.56.x:5000/ + :5000/login UNION probe
+# docker view (same host): ftp 192.168.56.x:2121, redis 192.168.56.x:6379
 ```
 
 ## Gotchas
