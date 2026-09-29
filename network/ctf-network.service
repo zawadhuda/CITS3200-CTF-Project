@@ -7,10 +7,10 @@ Requires=docker.service
 Type=oneshot
 RemainAfterExit=yes
 WorkingDirectory=/opt/network
-# PASV_ADDRESS must be the docker host's player-visible IP (e.g. the
-# 192.168.56.x address), otherwise passive FTP breaks for off-host players.
+# PASV_ADDRESS must be the docker host's player-visible IP (check
+# `ip -4 addr` on the VM), otherwise passive FTP breaks for off-host players.
 # Set it once via: systemctl edit ctf-network.service  →  [Service]
-# Environment=PASV_ADDRESS=192.168.56.x   (then daemon-reload + restart)
+# Environment=PASV_ADDRESS=<vm-ip>   (then daemon-reload + restart)
 ExecStart=/usr/bin/docker compose up -d --build
 ExecStop=/usr/bin/docker compose down
 

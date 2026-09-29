@@ -1,9 +1,8 @@
 If you're reading this, you owned the cache box. Enjoy it — but this
 isn't where the real root is.
 
-The actual crown jewels live on the Helix corporate portal:
-
-    http://192.168.56.x:5000/
+The actual crown jewels live on the Helix corporate portal — port 5000,
+on the same host you've been scanning all along. You know what to do.
 
 Get yourself an employee session there (the login page leaks more than it
 should), then look at the profile restore feature. It won't accept your

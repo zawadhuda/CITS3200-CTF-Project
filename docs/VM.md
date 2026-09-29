@@ -14,7 +14,11 @@
 | Auth service (RE) | `helix-auth.service` | `authsvc` | `:8888`, flag in unit `Environment=FLAG` | `challenges/auth_service/setup.sh` |
 | SUID diag (privesc) | — (SUID binary) | root (`4755`) | `/opt/helix/helix-diag`, flag in `/root/root.flag` (`0600`) | `challenges/auth_service/setup.sh` |
 | Secure vault (crypto) | `helix-vault.service` | `vaultsvc` | `:9000`, server `root:vaultsvc` `0750` | `challenges/vault/setup.sh` |
-| Docker network lab | `ctf-network.service` | root (containers) | FTP `:2121`, web `:8080`, ssh `:2222`, redis `:6379`, SNMP `:1610/udp` — published on all host interfaces, so players use `192.168.56.x:<port>`; the `10.20.30.x` container IPs are internal only | compose tree synced to `/opt/network` by hand; unit installed by `setup_vm.sh` |
+| Docker network lab | `ctf-network.service` | root (containers) | FTP `:2121`, web `:8080`, ssh `:2222`, redis `:6379`, SNMP `:1610/udp` — published on all host interfaces, so players use `<vm-ip>:<port>`; the `10.20.30.x` container IPs are internal only | compose tree synced to `/opt/network` by hand; unit installed by `setup_vm.sh` |
+
+The VM takes its address from the hypervisor's host-only DHCP server, so
+there is no fixed IP: `<vm-ip>` below means whatever `ip -4 addr` reports
+on the VM.
 
 Bots `Require=flaskapp.service` and restart after it; auth/vault/docker-lab
 are independent. Everything is reachable immediately after boot — no manual
@@ -39,20 +43,20 @@ sh scripts/package_app.sh /tmp/app   # self-checks for solution strings
 Transfer (as `sys-user` — bundle layout preserved so `setup_vm.sh` finds it):
 
 ```sh
-scp -r /tmp/app sys-user@192.168.56.x:/tmp/app
-scp -r scripts src challenges sys-user@192.168.56.x:/tmp/helix-src/
+scp -r /tmp/app sys-user@<vm-ip>:/tmp/app
+scp -r scripts src challenges sys-user@<vm-ip>:/tmp/helix-src/
 ```
 
 Sync the docker tree by hand (it stays yours to manage):
 
 ```sh
-scp -r network sys-user@192.168.56.x:/tmp/helix-network/
+scp -r network sys-user@<vm-ip>:/tmp/helix-network/
 # on the VM as root:
 rm -rf /opt/network && mv /tmp/helix-network /opt/network
 chown -R root:root /opt/network && chmod -R go-rwx /opt/network
 # set PASV_ADDRESS to the VM's player-visible IP for off-host passive FTP
 # (via override, since the unit ships without it):
-#   systemctl edit ctf-network.service   # add: [Service] / Environment=PASV_ADDRESS=192.168.56.x
+#   systemctl edit ctf-network.service   # add: [Service] / Environment=PASV_ADDRESS=<vm-ip>  (from `ip -4 addr`)
 ```
 
 VM (as root, one command):
@@ -72,8 +76,8 @@ flags, and solvers).
 systemctl is-active flaskapp.service helix-w3-bot.service helix-oracle-worker.service helix-auth.service helix-vault.service
 journalctl -u flaskapp.service --no-pager | tail -5   # no traceback, no debugger PIN
 ss -ltn | grep -E ':(5000|8888|9000|2121|8080|2222|6379|1610)'   # web, services, docker
-# player view: http://192.168.56.x:5000/ + :5000/login UNION probe
-# docker view (same host): ftp 192.168.56.x:2121, redis 192.168.56.x:6379
+# player view: http://<vm-ip>:5000/ + :5000/login UNION probe
+# docker view (same host): ftp <vm-ip>:2121, redis <vm-ip>:6379
 ```
 
 ## Gotchas
