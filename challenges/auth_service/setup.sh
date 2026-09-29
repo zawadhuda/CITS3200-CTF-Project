@@ -30,7 +30,7 @@ chmod 4755 "$bin_dir/helix-diag"
 
 # Root flag: root-readable only. The player reads it after the PATH-hijack
 # privesc drops them into a root shell (see privesc.sh, authors only).
-printf '%s\n' 'helix{vert_suid-binary-authsvc}' > /root/root.flag
+printf '%s\n' 'helix{ok_fine_youre_hired}' > /root/root.flag
 chmod 0600 /root/root.flag
 
 # Closing beat of the intern-vs-server story: the server concedes.

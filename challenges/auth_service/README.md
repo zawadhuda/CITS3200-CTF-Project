@@ -7,7 +7,7 @@ other member's code.
 | Stage | Category | Payoff |
 |---|---|---|
 | Pull + reverse `auth_service` → keygen → shell as `authsvc` | **RE** + network foothold | shell + diagnostics taunt nudging at the next step (no flag) |
-| SUID `helix-diag` PATH hijack → root | **vertical** privesc | `helix{vert_suid-binary-authsvc}` (submitted) |
+| SUID `helix-diag` PATH hijack → root | **vertical** privesc | `helix{ok_fine_youre_hired}` (submitted) |
 
 Pairs with the padding-oracle vault (advanced/crypto) to form your full
 individual contribution: RE + crypto + a distinct root path, all beyond the
@@ -40,7 +40,7 @@ gcc -O1 -Wno-unused-result -o helix-diag helix-diag.c
   chmod 4755 /opt/helix/helix-diag      # SUID root
   ```
   Make it reachable/known to `authsvc` (e.g. in its PATH or a discoverable dir).
-- Drop `helix{vert_suid-binary-authsvc}` in `/root/root.flag` (the privesc reads it).
+- Drop `helix{ok_fine_youre_hired}` in `/root/root.flag` (the privesc reads it).
 
 ## Player walkthrough
 1. Obtain the binary; `objdump -d auth_service`, find `<validate>`.

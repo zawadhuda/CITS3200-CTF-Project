@@ -33,8 +33,8 @@ if ! command -v chromium >/dev/null 2>&1 \
 fi
 
 install -d -o root -g root -m 0755 "$flag_dir" "$bot_dir" "$config_dir"
-printf '%s\n' 'helix{web_stored-xss-admin-bot}' > "$flag_dir/w3.txt"
-printf '%s\n' 'helix{adv_indirect-prompt-injection}' > "$flag_dir/a1.txt"
+printf '%s\n' 'helix{cookie_slipped_lol}' > "$flag_dir/w3.txt"
+printf '%s\n' 'helix{i_told_you_so_anyway}' > "$flag_dir/a1.txt"
 chown root:w3-bot "$flag_dir/w3.txt"
 chown root:oracle-bot "$flag_dir/a1.txt"
 chmod 0640 "$flag_dir/w3.txt" "$flag_dir/a1.txt"

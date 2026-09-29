@@ -15,7 +15,7 @@ if ! getent group svc-web-prod >/dev/null 2>&1; then
 fi
 
 install -d -o root -g root -m 0755 "$flag_dir"
-printf '%s\n' 'helix{web_insecure-deserialization}' > "$flag_file"
+printf '%s\n' 'helix{unpickled_and_unbothered}' > "$flag_file"
 chown root:svc-web-prod "$flag_file"
 chmod 0640 "$flag_file"
 

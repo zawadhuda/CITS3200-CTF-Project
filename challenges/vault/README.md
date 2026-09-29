@@ -14,7 +14,7 @@ Covers two brief requirements at once: advanced challenge #2 **and**
 - `_selftest.py` — spins up server, runs solver, asserts the flag. CI/sanity.
 
 ## Flag
-`helix{adv_padding-oracle-cbc-vault}` — it *is* the decrypted plaintext, so
+`helix{vault_unsealed_oops}` — it *is* the decrypted plaintext, so
 recovering it is the whole challenge (nothing to grep on disk).
 
 ## Deploy (VM)

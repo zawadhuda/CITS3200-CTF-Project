@@ -32,7 +32,7 @@ _KEY = bytes.fromhex("6b3a9f1c8d2e5740b1c6a9f30e7d4852"
 _IV = bytes.fromhex("00112233445566778899aabbccddeeff")
 
 # What the sealed token decrypts to. Recovering this string IS the win.
-_SECRET = b"helix{adv_padding-oracle-cbc-vault}"
+_SECRET = b"helix{vault_unsealed_oops}"
 
 # The magic prefix a *real* token must start with once decrypted. Lets the
 # server tell "padding was fine but this isn't a token" apart from

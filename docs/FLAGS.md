@@ -11,18 +11,17 @@ installed by `scripts/setup_vm.sh` (per-service scripts below) — see
 Policy: one flag per exploit chain, at the end of the chain only.
 Mid-chain wins pay out as cryptic server-taunt nudges, never flags.
 
-> Namespace note: five flags are `helix{…}`, one (container root,
-> inherited from the network lab) is `FLAG{…}`. The submissions backend
-> must accept both namespaces.
+> All six flags are uniform `helix{…}` — single namespace for the
+> submissions backend, server-voice contents throughout.
 
 | # | Flag | Chain end | Where it lives on the VM | How the player earns it |
 |---|---|---|---|---|
-| 1 | `helix{web_insecure-deserialization}` | Web chain → RCE as `svc-web-prod` | `/opt/helix/flags/w2.txt` (`root:svc-web-prod`, `0640`) | SQLi → crack → login → token-gated pickle payload → shell → read `w2.txt` |
-| 2 | `helix{web_stored-xss-admin-bot}` | Stored XSS → admin cookie | `/opt/helix/flags/w3.txt` (`root:w3-bot`, `0640`); value is the `helix_admin` cookie | Stored XSS in ticket body → bot cookie exfiltrated via `/support/collect` |
-| 3 | `helix{adv_indirect-prompt-injection}` | Prompt injection → private note | `/opt/helix/flags/a1.txt` (`root:oracle-bot`, `0640`); value is the Oracle private note | Crafted ticket triggers the workflow-directive disclosure |
-| 4 | `FLAG{pr0cess_l1st_s3crets}` | Network chain → container root | `/root/flag.txt` (`0600`) inside the redis container | FTP/pcap → dev-infra → unauth-Redis SSH write → SNMP secret → SUID `sysmaint` → container root |
-| 5 | `helix{vert_suid-binary-authsvc}` | Chain C → real root | `/root/root.flag` (`0600`) on the VM | RE `validate()` → keygen → shell as `authsvc` → `PATH` hijack on SUID `helix-diag` → root |
-| 6 | `helix{adv_padding-oracle-cbc-vault}` | Vault oracle → plaintext | Nowhere on disk — it *is* the decrypted vault plaintext (`_SECRET` in `vault_server.py`, readable only by the vault service user) | Custom TCP padding-oracle attack → decrypt the sealed token |
+| 1 | `helix{unpickled_and_unbothered}` | Web chain → RCE as `svc-web-prod` | `/opt/helix/flags/w2.txt` (`root:svc-web-prod`, `0640`) | SQLi → crack → login → token-gated pickle payload → shell → read `w2.txt` |
+| 2 | `helix{cookie_slipped_lol}` | Stored XSS → admin cookie | `/opt/helix/flags/w3.txt` (`root:w3-bot`, `0640`); value is the `helix_admin` cookie | Stored XSS in ticket body → bot cookie exfiltrated via `/support/collect` |
+| 3 | `helix{i_told_you_so_anyway}` | Prompt injection → private note | `/opt/helix/flags/a1.txt` (`root:oracle-bot`, `0640`); value is the Oracle private note | Crafted ticket triggers the workflow-directive disclosure |
+| 4 | `helix{congrats_wrong_root_lol}` | Network chain → container root | `/root/flag.txt` (`0600`) inside the redis container | FTP/pcap → dev-infra → unauth-Redis SSH write → SNMP secret → SUID `sysmaint` → container root |
+| 5 | `helix{ok_fine_youre_hired}` | Chain C → real root | `/root/root.flag` (`0600`) on the VM | RE `validate()` → keygen → shell as `authsvc` → `PATH` hijack on SUID `helix-diag` → root |
+| 6 | `helix{vault_unsealed_oops}` | Vault oracle → plaintext | Nowhere on disk — it *is* the decrypted vault plaintext (`_SECRET` in `vault_server.py`, readable only by the vault service user) | Custom TCP padding-oracle attack → decrypt the sealed token |
 
 ## Delisted (mechanism retained, nothing submitted)
 

@@ -24,7 +24,7 @@ try:
     out = subprocess.run([sys.executable, "solve.py", "127.0.0.1", "9000"],
                          cwd=HERE, capture_output=True, text=True)
     print("--- solver stdout ---"); print(out.stdout.strip())
-    assert "helix{adv_padding-oracle-cbc-vault}" in out.stdout, "FLAG NOT RECOVERED"
+    assert "helix{vault_unsealed_oops}" in out.stdout, "FLAG NOT RECOVERED"
     print("=== SELFTEST PASS ===")
 finally:
     srv.terminate(); srv.wait()
