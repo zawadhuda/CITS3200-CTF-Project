@@ -3,6 +3,11 @@
 {% block content %}
 <div class="container dash">
   <p class="eyebrow">Support ticket #{{ ticket.id }}</p>
+  {% if ticket.reviewed %}
+  <p><span class="pill">Administrator review: complete</span></p>
+  {% else %}
+  <p><span class="pill">Administrator review: pending</span></p>
+  {% endif %}
   <h2>{{ ticket.subject }}</h2>
   <div class="card" style="margin-top:24px">
     <h3>Submitted report</h3>
@@ -24,6 +29,7 @@
     <span class="mono">{{ report.captured_data }}</span>
   </div>
   {% endif %}
+  <p class="help muted">Reviewer browsers beacon diagnostics to /support/collect/{{ ticket.id }} — anything they capture appears above.</p>
   <p><a href="{{ url_for('support') }}">← Back to support</a></p>
 </div>
 {% endblock %}
