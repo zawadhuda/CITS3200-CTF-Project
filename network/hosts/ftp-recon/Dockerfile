@@ -1,6 +1,6 @@
-# ftp-recon (10.20.30.41) — N1/F1
-# Anonymous vsftpd exposing a captured pcap (+ its generator script) that
-# leaks HTTP Basic-auth creds and an SNMP community string. Also serves the
+# ftp-recon (10.20.30.41) — N1
+# Anonymous vsftpd exposing a captured pcap that leaks HTTP Basic-auth
+# creds and an SNMP community string. Also serves the basic-auth-protected
 # basic-auth-protected /dev-infra-backup/ dir those creds unlock, purely so
 # the pcap's request/response is grounded in something real on the wire.
 FROM debian:bookworm-slim
