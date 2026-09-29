@@ -1,12 +1,12 @@
-If you're reading this, you owned the cache box. Enjoy it — but this
-isn't where the real root is.
+[cache-audit]: Root on a cache box. Adorable. Incident logged.
 
-The actual crown jewels live on the Helix corporate portal — port 5000,
-on the same host you've been scanning all along. You know what to do.
+This isn't where the real root is, and you know it. The Helix corporate
+portal is listening on port 5000, on the same host you've been scanning
+all along. The login page leaks more than it should — get yourself an
+employee session, then look at the profile restore feature.
 
-Get yourself an employee session there (the login page leaks more than it
-should), then look at the profile restore feature. It won't accept your
-backup without the restore token sitting next to this note
-(profile-token.txt) — send it as the X-Profile-Token header.
+It won't accept your backup without the restore token sitting next to
+this note (profile-token.txt). Send it as the X-Profile-Token header.
+No token, no restore. Don't make me laugh.
 
 Incident ref, in case anyone asks: PRM-403-9182.
