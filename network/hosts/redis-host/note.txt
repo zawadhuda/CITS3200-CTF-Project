@@ -2,11 +2,9 @@
 
 This isn't where the real root is, and you know it. The Helix corporate
 portal is listening on port 5000, on the same host you've been scanning
-all along. The login page leaks more than it should — get yourself an
-employee session, then look at the profile restore feature.
+all along.
 
-It won't accept your backup without the restore token sitting next to
-this note (profile-token.txt). Send it as the X-Profile-Token header.
-No token, no restore. Don't make me laugh.
+The restore desk doesn't take backups from strangers. Bring credentials.
+Figure out the rest yourself — you got this far.
 
 Incident ref, in case anyone asks: PRM-403-9182.
