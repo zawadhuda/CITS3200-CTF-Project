@@ -1,0 +1,13 @@
+[Unit]
+Description=Helix Secure Vault
+After=network.target
+
+[Service]
+User=vaultsvc
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 /opt/helix/vault_server.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

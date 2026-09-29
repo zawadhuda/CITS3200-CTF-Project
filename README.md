@@ -21,7 +21,7 @@ group project.
 ## Repository Structure
 
 - `src/` - Main project source code (Flask app, challenge workers, VM setup)
-- `scripts/` - Supporting scripts and utilities (`package_app.sh` builds the clean VM app dir)
+- `scripts/` - Supporting scripts and utilities (`package_app.sh` builds the clean VM app dir, `setup_vm.sh` provisions the whole VM — see `docs/VM.md`)
 - `challenges/` - Standalone CTF services (auth service, vault) — not part of the web app
 - `docs/` - Technical documentation and design notes (`FLAGS.md` is authors-only, never ships to the VM)
 - `evidence/` - Screenshots and supporting project evidence

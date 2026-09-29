@@ -9,7 +9,7 @@ app they serve rather than in a separate top-level folder.
 - `../templates/` — the changed or added templates.
 - `../workers/w3_admin_bot.py` — required W3 browser service.
 - `../workers/a1_oracle_worker.py` — required A1 ticket service.
-- `flaskapp.service` — the VM systemd unit (fixed; no stray lines, reads
+- `flaskapp.service` — the VM systemd unit (reads
   `/etc/helix/app-challenges.env`). Installed by `setup_w3_a1.sh`.
 - `w2_setup.sh` — installs the W2 flag permissions.
 - `setup_w3_a1.sh` — installs the Flask unit, the W3 and A1 services,
@@ -17,29 +17,15 @@ app they serve rather than in a separate top-level folder.
 
 No solution scripts, sample payloads, walkthroughs or test files are included.
 
-## What NEVER ships to the VM web directory
+## Deploying
 
-`workers/` (bot source) and this `deployment/` directory (setup scripts
-containing worker keys and flag strings) must never land in
-`/home/svc-web-prod/app/`. That directory is readable by the service
-account — i.e. by the attacker after the W2 RCE. Use the packaging
-script so only the runnable app is copied:
+Full-VM flow (all challenges, boot-ready) is orchestrated by
+`scripts/setup_vm.sh` — see `docs/VM.md`. Do not hand-roll these steps.
 
-```sh
-sh scripts/package_app.sh /tmp/app          # builds app.py + templates/ + static/ only
-scp -r /tmp/app sys-user@192.168.56.x:/tmp/
-```
-
-On the VM as root:
-
-```sh
-rm -rf /home/svc-web-prod/app
-mv /tmp/app /home/svc-web-prod/app
-chown -R svc-web-prod:svc-web-prod /home/svc-web-prod/app
-sh <repo>/src/helix-dynamics/deployment/w2_setup.sh
-sh <repo>/src/helix-dynamics/deployment/setup_w3_a1.sh
-systemctl daemon-reload && systemctl restart flaskapp.service
-```
+`workers/` and this `deployment/` directory (setup scripts containing
+worker keys and flag strings) must never land in `/home/svc-web-prod/app/`
+— package the web dir with `scripts/package_app.sh` (app.py + templates/ +
+static/ only).
 
 ## Notes
 

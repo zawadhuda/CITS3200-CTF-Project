@@ -4,7 +4,9 @@
 > discover these values by exploiting the matching challenge.
 
 All flags are **static** so they can be registered once in the flag
-submission backend. Do not randomise them at install time.
+submission backend. Do not randomise them at install time. All seven are
+installed by `scripts/setup_vm.sh` (per-service scripts below) — see
+`docs/VM.md`.
 
 | # | Flag | Challenge | Where it lives on the VM | How the player earns it |
 |---|---|---|---|---|
