@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #include <unistd.h>
 #include <stdint.h>
 #include <arpa/inet.h>
@@ -85,6 +86,9 @@ static char *fdgets(char *buf, int n, int fd)
 
 static void serve(void)
 {
+    /* Auto-reap children: without this every connection (legit or probe)
+     * leaves a zombie and sustained traffic exhausts the PID table. */
+    signal(SIGCHLD, SIG_IGN);
     int s = socket(AF_INET, SOCK_STREAM, 0);
     int opt = 1; setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof opt);
     struct sockaddr_in a = {0};

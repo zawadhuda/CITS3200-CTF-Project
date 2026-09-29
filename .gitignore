@@ -27,5 +27,9 @@ Thumbs.db
 build/
 dist/
 
+# Compiled challenge binaries (rebuilt from source by setup scripts)
+/challenges/auth_service/auth_service
+/challenges/auth_service/helix-diag
+
 # Helix Dynamics CTF app runtime data
 src/helix-dynamics/helix.db
