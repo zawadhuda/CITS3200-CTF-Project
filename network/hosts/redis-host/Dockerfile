@@ -1,5 +1,7 @@
-# redis-host (10.20.30.42) — N2/F2, and the box where the F3 root privesc
-# (SUID `sysmaint`, unlocked by the secret snmp-host leaks) actually happens.
+# redis-host (10.20.30.42) — N2 foothold (unauth Redis → web-user shell,
+# nudge toward the SNMP secret in ~/note.txt) and the box where the root
+# privesc (SUID `sysmaint`, unlocked by the secret snmp-host leaks, flag in
+# /root/flag.txt) actually happens.
 FROM debian:bookworm-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -33,7 +35,7 @@ RUN useradd -m -s /bin/bash web-user \
 COPY redis.conf /etc/redis.conf
 COPY sshd_config /etc/ssh/sshd_config
 COPY sysmaint.c /tmp/sysmaint.c
-COPY flag2.txt /home/web-user/flag.txt
+COPY nudge.txt /home/web-user/note.txt
 COPY flag3.txt /root/flag.txt
 COPY profile-token.txt /root/profile-token.txt
 COPY note.txt /root/note.txt
@@ -43,8 +45,8 @@ RUN gcc -O2 -o /usr/local/bin/sysmaint /tmp/sysmaint.c \
     && chown root:root /usr/local/bin/sysmaint \
     && chmod 4755 /usr/local/bin/sysmaint \
     && rm -f /tmp/sysmaint.c \
-    && chown web-user:web-user /home/web-user/flag.txt \
-    && chmod 644 /home/web-user/flag.txt \
+    && chown web-user:web-user /home/web-user/note.txt \
+    && chmod 644 /home/web-user/note.txt \
     && chown root:root /root/flag.txt /root/profile-token.txt /root/note.txt \
     && chmod 600 /root/flag.txt /root/profile-token.txt /root/note.txt \
     && chmod +x /entrypoint.sh \
