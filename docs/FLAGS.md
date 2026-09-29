@@ -17,6 +17,13 @@ installed by `scripts/setup_vm.sh` (per-service scripts below) — see
 | 5 | `helix{re_auth-service-backdoor}` | RE auth service (`:8888`) | `FLAG` env of the `authsvc` systemd service only — never on disk, never in the player-reversible binary copy | Reverse `validate()` → `keygen.py` → valid access code → shell as `authsvc` |
 | 6 | `helix{vert_suid-binary-authsvc}` | SUID privesc (`helix-diag`) | `/root/root.flag` | `PATH` hijack on the SUID-root `helix-diag` → root |
 | 7 | `helix{adv_padding-oracle-cbc-vault}` | Vault padding oracle (`:9000`) | Nowhere on disk — it *is* the decrypted vault plaintext (`_SECRET` in `vault_server.py`, readable only by the vault service user) | Custom TCP padding-oracle attack → decrypt the sealed token |
+| 8 | `FLAG{pcap_h1dd3n_1n_pla1n_s1ght}` | FTP pcap (static artifact) | Embedded in the recorded `/dev-infra-backup/` HTTP 200 body inside `network/hosts/ftp-recon/ftp_root/network-recon.pcap` (note: the live `runbook.txt` does NOT contain it — artifact only) | Pull the pcap over anonymous FTP, follow the Basic-auth session |
+| 9 | `FLAG{r3dis_wr1tes_wh3rever_1t_wants}` | Redis unauth write (`:6379`) | `/home/web-user/flag.txt` (`web-user:web-user`, `644`) in the redis container | `CONFIG SET dir/dbfilename` → `authorized_keys` → SSH as `web-user` → read `flag.txt` |
+| 10 | `FLAG{pr0cess_l1st_s3crets}` | SUID `sysmaint` privesc (container root) | `/root/flag.txt` (`0600`) in the redis container; password via SNMP `extend` leak | `snmpwalk` with `research_dev` → `B4ckup_S3cret_99!` → sysmaint → root |
+
+> Namespace note: webapp/service flags are `helix{…}`, network-lab flags
+> are `FLAG{…}` (inherited). The submissions backend must accept both
+> namespaces; see the unification proposal in the insertion table below.
 
 ## If the flag count needs trimming
 
