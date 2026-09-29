@@ -11,6 +11,10 @@ installed by `scripts/setup_vm.sh` (per-service scripts below) — see
 Policy: one flag per exploit chain, at the end of the chain only.
 Mid-chain wins pay out as cryptic server-taunt nudges, never flags.
 
+> Namespace note: five flags are `helix{…}`, one (container root,
+> inherited from the network lab) is `FLAG{…}`. The submissions backend
+> must accept both namespaces.
+
 | # | Flag | Chain end | Where it lives on the VM | How the player earns it |
 |---|---|---|---|---|
 | 1 | `helix{web_insecure-deserialization}` | Web chain → RCE as `svc-web-prod` | `/opt/helix/flags/w2.txt` (`root:svc-web-prod`, `0640`) | SQLi → crack → login → token-gated pickle payload → shell → read `w2.txt` |
