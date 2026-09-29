@@ -19,7 +19,7 @@ recovering it is the whole challenge (nothing to grep on disk).
 
 ## Deploy (VM)
 ```
-pip install cryptography
+apt install python3-cryptography   # not pip — see setup.sh
 python3 vault_server.py        # 0.0.0.0:9000
 ```
 Wire into systemd on Yash's box as its own low-priv service user. Players reach

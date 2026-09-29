@@ -13,16 +13,20 @@ padbuster speak HTTP oracles only, so players must understand the attack and
 write their own solver. That is the difficulty lever — see README.md.
 
 Run:  python3 vault_server.py           # listens on 0.0.0.0:9000
-Deps: pip install cryptography
+Deps: apt install python3-cryptography  (see setup.sh — not pip, so the
+      VM's pip-removal hardening cannot break this service)
 """
 import socketserver
-import os
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
 
 BLOCK = 16
 PORT = 9000
+# DoS guardrails. The sealed token is IV + 2 ciphertext blocks; reference
+# solvers only ever submit 2-block forgeries — anything larger is abuse.
+MAX_LINE = 8192
+MAX_BLOB_BLOCKS = 8
 
 # Server-side secret. Players never see this — they recover the plaintext
 # through the oracle. Hardcoded so the box is deterministic for the demo;
@@ -54,7 +58,8 @@ _TOKEN = _seal(_MAGIC + b"|" + _SECRET)
 
 def _oracle(blob: bytes) -> str:
     """Decrypt IV||CT and report status. The two ERR paths are the oracle."""
-    if len(blob) < 2 * BLOCK or len(blob) % BLOCK != 0:
+    if (len(blob) < 2 * BLOCK or len(blob) % BLOCK != 0
+            or len(blob) > MAX_BLOB_BLOCKS * BLOCK):
         return "ERR 0x03 bad-length"
     iv, ct = blob[:BLOCK], blob[BLOCK:]
     dec = Cipher(algorithms.AES(_KEY), modes.CBC(iv)).decryptor()
@@ -77,9 +82,11 @@ class Handler(socketserver.StreamRequestHandler):
     def handle(self):
         self.wfile.write(BANNER)
         while True:
-            line = self.rfile.readline()
+            line = self.rfile.readline(MAX_LINE)
             if not line:
                 break
+            if len(line) >= MAX_LINE and not line.endswith(b"\n"):
+                break  # oversize line: drop the connection, don't desync
             parts = line.split()
             if not parts:
                 continue
@@ -97,8 +104,8 @@ class Handler(socketserver.StreamRequestHandler):
                     self.wfile.write(b"ERR 0x04 usage: UNSEAL <hex>\r\n")
                     continue
                 try:
-                    blob = bytes.fromhex(parts[1].decode())
-                except ValueError:
+                    blob = bytes.fromhex(parts[1].decode("ascii"))
+                except (ValueError, UnicodeDecodeError):
                     self.wfile.write(b"ERR 0x05 not-hex\r\n")
                     continue
                 self.wfile.write(_oracle(blob).encode() + b"\r\n")
