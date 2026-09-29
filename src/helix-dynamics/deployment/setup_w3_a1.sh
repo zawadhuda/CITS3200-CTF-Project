@@ -42,8 +42,19 @@ chmod 0640 "$flag_dir/w3.txt" "$flag_dir/a1.txt"
 install -o root -g w3-bot -m 0750 "$workers_dir/w3_admin_bot.py" "$bot_dir/w3_admin_bot.py"
 install -o root -g oracle-bot -m 0750 "$workers_dir/a1_oracle_worker.py" "$bot_dir/a1_oracle_worker.py"
 
-# The application receives only worker keys. It never receives either flag.
-cat > "$config_dir/app-challenges.env" <<'EOF'
+# The application receives only worker keys and its Flask secret.
+# It never receives any flag. Flags stay static (see docs/FLAGS.md)
+# so they can be registered in the submissions backend.
+# The Flask secret is generated once and preserved across re-runs:
+# none of the implemented challenges depend on the weak default.
+if [ -f "$config_dir/app-challenges.env" ] \
+    && grep -q '^HELIX_SECRET=' "$config_dir/app-challenges.env" 2>/dev/null; then
+    helix_secret=$(grep '^HELIX_SECRET=' "$config_dir/app-challenges.env" | cut -d= -f2-)
+else
+    helix_secret=$(python3 -c 'import secrets; print(secrets.token_hex(32))')
+fi
+cat > "$config_dir/app-challenges.env" <<EOF
+HELIX_SECRET=$helix_secret
 HELIX_REVIEW_KEY=helix-review-6b8cb1e89e04
 HELIX_ORACLE_WORKER_KEY=helix-oracle-3af705c1d294
 EOF
@@ -67,11 +78,12 @@ EOF
 chown root:oracle-bot "$config_dir/oracle-bot.env"
 chmod 0640 "$config_dir/oracle-bot.env"
 
-install -d -o root -g root -m 0755 /etc/systemd/system/flaskapp.service.d
-cat > /etc/systemd/system/flaskapp.service.d/challenges.conf <<'EOF'
-[Service]
-EnvironmentFile=/etc/helix/app-challenges.env
-EOF
+# The Flask unit lives in this directory (flaskapp.service) and already
+# points at /etc/helix/app-challenges.env, so no drop-in override is needed.
+# Remove any stale drop-in from earlier installs.
+rm -rf /etc/systemd/system/flaskapp.service.d
+install -o root -g root -m 0644 "$challenge_dir/flaskapp.service" \
+    /etc/systemd/system/flaskapp.service
 
 cat > /etc/systemd/system/helix-w3-bot.service <<'EOF'
 [Unit]

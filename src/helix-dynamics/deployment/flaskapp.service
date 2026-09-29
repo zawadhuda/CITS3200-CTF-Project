@@ -1,0 +1,23 @@
+[Unit]
+Description=Corporate Flask Web Application
+After=network.target
+
+[Service]
+User=svc-web-prod
+Group=svc-web-prod
+WorkingDirectory=/home/svc-web-prod/app
+# Challenge keys + Flask secret. Created by setup_w3_a1.sh
+# (root:svc-web-prod, 0640). The app falls back to insecure
+# development defaults if this file is missing — do not start
+# the service without it on the CTF VM.
+EnvironmentFile=/etc/helix/app-challenges.env
+ExecStart=/usr/bin/python3 /home/svc-web-prod/app/app.py
+Restart=always
+RestartSec=5
+
+# Hardening
+ProtectSystem=full
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
