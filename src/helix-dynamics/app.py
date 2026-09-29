@@ -1,8 +1,6 @@
 """
-Helix Dynamics — CITS3006 CTF target application.
+Helix Dynamics — corporate employee portal.
 
-The student-owned challenge hooks are W2 profile deserialisation, W3 stored
-DOM XSS in administrator ticket review, and A1 support-ticket prompt injection.
 Run this version only in the isolated CTF VM.
 
 Run (CTF VM):
@@ -43,7 +41,7 @@ REVIEW_KEY = os.environ.get("HELIX_REVIEW_KEY", "development-review-key")
 ORACLE_WORKER_KEY = os.environ.get(
     "HELIX_ORACLE_WORKER_KEY", "development-oracle-key")
 
-# --- Basic Auth creds for the hidden dev page (creds should also appear in your FTP PCAP) ---
+# --- Basic Auth for the dev infrastructure page ---
 DEV_USER = "devops"
 DEV_PASS = "helixbuild2026"
 
@@ -85,15 +83,15 @@ def init_db():
         cur = c.execute("SELECT COUNT(*) n FROM employees").fetchone()
         if cur["n"] == 0:
             def junk():
-                return hashlib.md5(os.urandom(24)).hexdigest()   # uncrackable
-            weak = hashlib.md5(FLAG_WEB_SQLI.encode()).hexdigest()  # crackable -> flag
+                return hashlib.md5(os.urandom(24)).hexdigest()
+            weak = hashlib.md5(FLAG_WEB_SQLI.encode()).hexdigest()
             rows = [
                 ("alice.morgan@helix.local",  junk(), "Dr. Alice Morgan",
                  "Research Engineer", "RESEARCH"),
                 ("bob.nkemdirim@helix.local", junk(), "Bob Nkemdirim",
                  "Infrastructure Engineer", "RESEARCH"),
                 ("charlie.voss@helix.local",  weak, "Charlie Voss",
-                 "Systems Analyst", "RESEARCH"),   # <-- the crackable one
+                 "Systems Analyst", "RESEARCH"),
                 ("dana.reid@helix.local",     junk(), "Dana Reid",
                  "Compliance Officer", "RESEARCH"),
             ]
@@ -153,9 +151,7 @@ def login():
     if request.method == "POST":
         email = request.form.get("email", "")
         pw = request.form.get("password", "")
-        # [CTF][WEB-1] SQL INJECTION (in-band). The lookup is string-built, so
-        # `<email>' -- ` comments out the "AND recovery_md5 IS NULL" filter and
-        # returns that account's row, revealing the password hash it normally hides.
+        # Directory lookup for the result card below.
         query = "SELECT name, email, title FROM employees WHERE email='%s'" % email
         try:
             with db() as c:
@@ -163,7 +159,7 @@ def login():
         except sqlite3.Error:
             record = None
 
-        # AUTH is separate and SAFE (parameterised): injection reveals data, never a session.
+        # Authenticate against the employees table.
         with db() as c:
             acct = c.execute("SELECT * FROM employees WHERE email=?", (email,)).fetchone()
         if acct and hashlib.md5(pw.encode()).hexdigest() == acct["password"]:
@@ -217,7 +213,7 @@ def support_ticket(ticket_id):
 
 @app.route("/support/collect/<int:ticket_id>")
 def collect_browser_report(ticket_id):
-    """Same-origin collection point used by the W3 browser payload."""
+    """Record a browser report for a ticket."""
     captured = request.args.get("data", "")[:4096]
     with db() as c:
         exists = c.execute(
@@ -317,20 +313,16 @@ def profile():
 @login_required
 def profile_export():
     u = current_user()
-    # Save the profile as a Python object, then Base64-encode it for the .hpf file.
-    payload = {"email": u["email"], "name": u["name"],
-               "title": u["title"], "clearance": u["clearance"]}
-    blob = base64.b64encode(pickle.dumps(payload, protocol=4))
+    # Serialise the profile for the .hpf download.
+    profile_data = {"email": u["email"], "name": u["name"],
+                    "title": u["title"], "clearance": u["clearance"]}
+    blob = base64.b64encode(pickle.dumps(profile_data, protocol=4))
     return Response(blob, mimetype="application/octet-stream",
                     headers={"Content-Disposition": "attachment; filename=profile.hpf"})
 
 
 def load_profile_package(raw):
-    """Decode a Helix profile package.
-
-    Pickle is deliberately used here for the W2 challenge. Loading a pickle from
-    an untrusted upload can run code as the web service account.
-    """
+    """Decode a Helix profile package (.hpf)."""
     decoded = base64.b64decode(raw, validate=True)
 
     try:
@@ -363,7 +355,7 @@ def profile_import():
     return redirect(url_for("profile"))
 
 
-# ---------- Hidden dev infrastructure (Basic Auth gated) ----------
+# ---------- Dev infrastructure (Basic Auth gated) ----------
 def check_basic(auth):
     return auth and auth.username == DEV_USER and auth.password == DEV_PASS
 
