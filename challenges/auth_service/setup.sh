@@ -33,6 +33,24 @@ chmod 4755 "$bin_dir/helix-diag"
 printf '%s\n' 'helix{vert_suid-binary-authsvc}' > /root/root.flag
 chmod 0600 /root/root.flag
 
+# Closing beat of the intern-vs-server story: the server concedes.
+# Flavor only — solvers keep reading /root/root.flag, never this file.
+cat > /root/offer.txt <<'EOF'
+[FINAL AUDIT DISPATCH]
+Subject matched no known intern profile. Similarity Score: 100% - hired.
+
+You did what the intern couldn't: cache box, portal, restore desk,
+auth service, and my diagnostics helper. The footage is still going
+to Legal. The job offer is going to you.
+
+Position: Junior Penetration Tester, Helix Dynamics.
+Start Monday. Don't touch Redis. Don't store creds in pcaps.
+And stop staring at the glass.
+
+- MGMT (the server keeps the last word, obviously)
+EOF
+chmod 0600 /root/offer.txt
+
 install -o root -g root -m 0644 "$svc_dir/helix-auth.service" \
     /etc/systemd/system/helix-auth.service
 
