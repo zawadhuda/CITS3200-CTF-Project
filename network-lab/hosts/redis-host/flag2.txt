@@ -1,0 +1,1 @@
+FLAG{r3dis_wr1tes_wh3rever_1t_wants}

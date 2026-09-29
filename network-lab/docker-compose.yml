@@ -1,0 +1,40 @@
+networks:
+  ctf-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.20.30.0/24
+
+services:
+  ftp-recon:
+    build: ./hosts/ftp-recon
+    container_name: ftp-recon
+    hostname: ftp-recon
+    networks:
+      ctf-net:
+        ipv4_address: 10.20.30.41
+    ports:
+      - "2121:21"
+      - "8080:80"
+      - "30000-30009:30000-30009"
+
+  redis-host:
+    build: ./hosts/redis-host
+    container_name: redis-host
+    hostname: redis-host
+    networks:
+      ctf-net:
+        ipv4_address: 10.20.30.42
+    ports:
+      - "2222:22"
+      - "6379:6379"
+
+  snmp-host:
+    build: ./hosts/snmp-host
+    container_name: snmp-host
+    hostname: snmp-host
+    networks:
+      ctf-net:
+        ipv4_address: 10.20.30.43
+    ports:
+      - "1610:161/udp"
