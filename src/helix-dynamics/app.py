@@ -19,7 +19,7 @@ import secrets
 import sqlite3
 from functools import wraps
 
-from flask import (Flask, flash, redirect, render_template, request,
+from flask import (Flask, flash, jsonify, redirect, render_template, request,
                    session, url_for, Response, abort)
 ITER = 200_000
 def strong_hash(pw):
@@ -379,4 +379,8 @@ def dev_infra():
 
 if __name__ == "__main__":
     init_db()
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    # Debug is OFF by default. The CTF VM must run with it off: the
+    # Werkzeug debugger is an unauthenticated remote console.
+    # Local dev only: HELIX_DEBUG=1 python3 app.py
+    app.run(host="0.0.0.0", port=5000,
+            debug=os.environ.get("HELIX_DEBUG") == "1")
