@@ -36,10 +36,11 @@ gcc -O1 -Wno-unused-result -o helix-diag helix-diag.c
 - Install the privesc target:
   ```
   cp helix-diag /opt/helix/helix-diag
-  chown root:root /opt/helix/helix-diag
-  chmod 4755 /opt/helix/helix-diag      # SUID root
+  chown root:remote-ops /opt/helix/helix-diag
+  chmod 4750 /opt/helix/helix-diag      # SUID root, remote-ops only
   ```
-  Make it reachable/known to `authsvc` (e.g. in its PATH or a discoverable dir).
+  Discoverable by all (`find -perm -4000`) but executable by `remote-ops`
+  alone — service shells must earn that group first, no skipping to root.
 - Drop `helix{ok_fine_youre_hired}` in `/root/root.flag` (the privesc reads it).
 
 ## Player walkthrough
@@ -48,7 +49,7 @@ gcc -O1 -Wno-unused-result -o helix-diag helix-diag.c
    48 bits, final `xor 0xc0ffee1234`. Reimplement (`keygen.py`).
 3. `nc <host> 8888`, send a username + the computed hex code → shell as `authsvc`
    + diagnostics taunt pointing at the next step (no flag here).
-4. On the box: notice `helix-diag` is SUID-root; `strings`/objdump shows it calls
+4. On the box as `remote-ops`: notice `helix-diag` is SUID-root; `strings`/objdump shows it calls
    `netcheck` unqualified. Plant a malicious `netcheck`, prepend to `$PATH`, run
    it → root + submitted flag. (`privesc.sh` automates this.)
 

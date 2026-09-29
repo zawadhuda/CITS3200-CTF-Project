@@ -1,7 +1,8 @@
 #!/bin/sh
-# Reference privesc for Chain C terminus — run this AS the authsvc user after
-# the auth-service foothold drops you a shell. Turns the SUID helix-diag's
-# unqualified `netcheck` call into a root shell via PATH hijack.
+# Reference privesc for Chain C terminus — run this AS the remote-ops user
+# (the binary is 4750 root:remote-ops; service shells get Permission denied).
+# Turns the SUID helix-diag's unqualified `netcheck` call into a root shell
+# via PATH hijack.
 #
 # Usage:  sh privesc.sh /path/to/helix-diag
 

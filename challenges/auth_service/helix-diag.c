@@ -4,8 +4,10 @@
  * A "system diagnostics" helper left SUID-root on the box. The developer added
  * setuid(0) so it always has the perms it needs, but calls a helper by an
  * UNQUALIFIED name via system(), so /bin/sh resolves it through the caller's
- * $PATH. Anyone who can run this (the authsvc user reached in Chain C) can
- * drop a malicious `netcheck` earlier in $PATH and get root.
+ * $PATH. Anyone who can run this (the remote-ops user at the end of the
+ * local-escalation chain) can drop a malicious `netcheck` earlier in $PATH
+ * and get root. Deployed 4750 root:remote-ops: other users can see it but
+ * get Permission denied — no skipping straight from a service shell.
  *
  * This is NOT a bare GTFOBins SUID (those get auto-flagged and auto-exploited
  * by linpeas). The SUID bit alone gives nothing; the attacker must spot the
@@ -13,7 +15,7 @@
  *
  * Build/deploy (needs root, on the VM):
  *     gcc -O1 -o helix-diag helix-diag.c
- *     sudo chown root:root helix-diag && sudo chmod 4755 helix-diag
+  *     sudo chown root:remote-ops helix-diag && sudo chmod 4750 helix-diag
  */
 #include <stdio.h>
 #include <stdlib.h>

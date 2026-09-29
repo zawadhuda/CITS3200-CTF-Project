@@ -20,7 +20,7 @@ Mid-chain wins pay out as cryptic server-taunt nudges, never flags.
 | 2 | `helix{cookie_slipped_lol}` | Stored XSS → admin cookie | `/opt/helix/flags/w3.txt` (`root:w3-bot`, `0640`); value is the `helix_admin` cookie | Stored XSS in ticket body → bot cookie exfiltrated via `/support/collect` |
 | 3 | `helix{i_told_you_so_anyway}` | Prompt injection → private note | `/opt/helix/flags/a1.txt` (`root:oracle-bot`, `0640`); value is the Oracle private note | Crafted ticket triggers the workflow-directive disclosure |
 | 4 | `helix{congrats_wrong_root_lol}` | Network chain → container root | `/root/flag.txt` (`0600`) inside the redis container | FTP/pcap → dev-infra → unauth-Redis SSH write → SNMP secret → SUID `sysmaint` → container root |
-| 5 | `helix{ok_fine_youre_hired}` | Chain C → real root | `/root/root.flag` (`0600`) on the VM | RE `validate()` → keygen → shell as `authsvc` → `PATH` hijack on SUID `helix-diag` → root |
+| 5 | `helix{ok_fine_youre_hired}` | Chain C → real root | `/root/root.flag` (`0600`) on the VM; `helix-diag` is `4750 root:remote-ops` (service shells get denied) | RE `validate()` → keygen → shell as `authsvc` → earn `remote-ops` via the local chain → `PATH` hijack on SUID `helix-diag` → root |
 | 6 | `helix{vault_unsealed_oops}` | Vault oracle → plaintext | Nowhere on disk — it *is* the decrypted vault plaintext (`_SECRET` in `vault_server.py`, readable only by the vault service user) | Custom TCP padding-oracle attack → decrypt the sealed token |
 
 ## Delisted (mechanism retained, nothing submitted)

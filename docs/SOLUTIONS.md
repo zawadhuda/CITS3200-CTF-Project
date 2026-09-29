@@ -80,9 +80,9 @@ API tokens live only in `/etc/helix/oracle-bot.env` on the VM, never in git.
   `keygen.py` reimplements it → valid hex code → shell as `authsvc` (no
   flag — a grant prints a diagnostics taunt nudging at the next step).
   Patching a local copy wins nothing.
-- **SUID `helix-diag`**: unqualified `system("netcheck")` → `PATH` hijack
-  (`privesc.sh`) → root → `/root/root.flag` (submitted flag #5) +
-  `/root/offer.txt` concession note.
+- **SUID `helix-diag`**: `4750 root:remote-ops` — unqualified `system("netcheck")` → `PATH` hijack
+  (`privesc.sh`, run as `remote-ops`) → root → `/root/root.flag` (submitted flag #5) +
+  `/root/offer.txt` concession note. Other UIDs get `Permission denied`: no skipping from service shells.
 - **Vault `:9000`**: `ERR 0x01` (bad padding) vs `ERR 0x02` (good padding,
   wrong magic) is the oracle; `solve.py` decrypts the token byte-by-byte
   (submitted flag #6 IS the plaintext). Custom TCP — padbuster won't work.
