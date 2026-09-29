@@ -313,11 +313,6 @@ Wording only; DOM/keys/trigger-words are load-bearing and stay as-is.
 | ftp `runbook.txt` | sign notes `- devops (do NOT revert my changes)` |
 | Flask flashes | `Invalid profile token. The restore desk is unimpressed. Incident logged.` / keep `Invalid .hpf file` ice-cold with no joke (a joke here would read as a hint) |
 | `note.txt` breadcrumb | server taunt (already rewritten — see `network/hosts/redis-host/note.txt`) |
-| sysmaint prompts | `sysmaint - internal maintenance utility (abandon hope, interns)` / `Access denied. Incident logged. Legal has been notified, again.` — password logic untouched |
-| SNMP `snmpd.conf`/`leak_cmd` | config comments only; the `extend` output line must stay byte-identical (it's the leaked secret) |
-| vsftpd/nginx | server banners stay stock (`Server: nginx`, FTP `220`); a cocky banner would fingerprint the box as a CTF — stock is stealthier |
-| `offer.txt` (real root) | already written — see `challenges/auth_service/setup.sh` |
-| support ticket flow | `Ticket submitted. Awaiting automated administrator review. (The administrator is automated. The review is not.)` |
 
 ## Pre-ship checklist (theme)
 

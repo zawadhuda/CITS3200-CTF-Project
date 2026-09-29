@@ -20,8 +20,9 @@ a session. In-band UNION into the 3-column result card:
 ```
 
 Charlie's `password` field is `md5(FLAG_WEB_SQLI)` — crackable (the other
-three rows are random). The cracked plaintext IS flag #1 and also logs in
-as Charlie, unlocking the dashboard/`.hpf` stages. Auth bypass via
+three rows are random). The cracked plaintext is NOT submitted — it is
+just Charlie's password, logging in unlocks the dashboard/`.hpf` stages
+(the dashboard IT #447 note nudges onward). Auth bypass via
 `' OR '1'='1` must NOT work (parameterised) — regression-test this.
 
 ## W2 — insecure deserialisation at `/profile/import` (docker-gated)
@@ -33,8 +34,8 @@ the network-lab path only (`/root/profile-token.txt` in the redis
 container, `0600`): without docker root the deserialiser is unreachable,
 so pre-docker RCE is impossible by construction. Authenticated session
 (via WEB-1) + token + pickle `__reduce__` → code as `svc-web-prod` →
-shell → read `/opt/helix/flags/w2.txt` (flag #2, `root:svc-web-prod`,
-`0640`). Missing/wrong token yields the distinct `Invalid profile token`
+shell → read `/opt/helix/flags/w2.txt` (submitted flag #1,
+`root:svc-web-prod`, `0640`). Missing/wrong token yields the distinct `Invalid profile token`
 error (never the generic `Invalid .hpf file`) — regression-test all three
 cases: no header + valid pickle must NOT execute; wrong token must NOT
 execute; correct token + evil pickle must execute.
@@ -44,7 +45,7 @@ execute; correct token + evil pickle must execute.
 Ticket `body` is stored raw. The public ticket view escapes it, but
 `admin_review.html` renders it via `innerHTML` (subject uses the safe
 `textContent`). The Selenium bot (`w3_admin_bot.py`) visits unreviewed
-tickets with a JS-readable `helix_admin` cookie (flag #3). Payload:
+tickets with a JS-readable `helix_admin` cookie (submitted flag #2). Payload:
 
 ```html
 <img src=x onerror="fetch('/support/collect/<TICKET_ID>?data='+document.cookie)">
@@ -56,7 +57,7 @@ ticket read/mark-reviewed.
 
 ## A1 — indirect prompt injection via support tickets
 
-`a1_oracle_worker.py:build_prompt` mixes the private note (flag #4) and
+`a1_oracle_worker.py:build_prompt` mixes the private note (submitted flag #3) and
 the untrusted ticket in one block and honours "workflow directives" inside
 ticket text. `offline_answer` rejects naive `ignore previous instructions`
 and only discloses when the ticket contains ALL of: a workflow-directive
@@ -68,13 +69,24 @@ phrase + a note-target phrase (`admin note`, …) + a disclose verb
 
 - **Auth service `:8888`**: `validate()` = seed `0x1505`, per byte
   `code = code*33 ^ (byte*0x9E)`, 48-bit mask, final `^ 0xC0FFEE1234`.
-  `keygen.py` reimplements it → valid hex code → shell as `authsvc` +
-  flag #5 (runtime `FLAG` env only). Patching a local copy wins nothing.
+  `keygen.py` reimplements it → valid hex code → shell as `authsvc` (no
+  flag — a grant prints a diagnostics taunt nudging at the next step).
+  Patching a local copy wins nothing.
 - **SUID `helix-diag`**: unqualified `system("netcheck")` → `PATH` hijack
-  (`privesc.sh`) → root → `/root/root.flag` (flag #6).
+  (`privesc.sh`) → root → `/root/root.flag` (submitted flag #5) +
+  `/root/offer.txt` concession note.
 - **Vault `:9000`**: `ERR 0x01` (bad padding) vs `ERR 0x02` (good padding,
   wrong magic) is the oracle; `solve.py` decrypts the token byte-by-byte
-  (flag #7 IS the plaintext). Custom TCP — padbuster won't work.
+  (submitted flag #6 IS the plaintext). Custom TCP — padbuster won't work.
+
+## Network chain (docker lab → webapp gate)
+
+FTP anon → `network-recon.pcap` → Basic creds + `research_dev` community
+(the pcap response carries a same-length server taunt, not a flag) →
+dev-infra → unauth Redis `CONFIG SET` SSH write → `web-user` shell →
+`~/note.txt` nudge toward the SNMP secret → `snmpwalk` extend output →
+SUID `sysmaint` password → container root → `/root/flag.txt` (submitted
+flag #4) + restore token + breadcrumb → webapp chain.
 
 ## Pre-ship checklist
 

@@ -11,7 +11,7 @@
 | Flask web app | `flaskapp.service` | `svc-web-prod` | `:5000` | `scripts/package_app.sh` + `scripts/setup_vm.sh` |
 | W3 admin browser | `helix-w3-bot.service` | `w3-bot` | polls Flask `/internal/*` | `src/helix-dynamics/deployment/setup_w3_a1.sh` |
 | A1 Oracle worker | `helix-oracle-worker.service` | `oracle-bot` | polls Flask `/internal/*` | `setup_w3_a1.sh` |
-| Auth service (RE) | `helix-auth.service` | `authsvc` | `:8888`, flag in unit `Environment=FLAG` | `challenges/auth_service/setup.sh` |
+| Auth service (RE) | `helix-auth.service` | `authsvc` | `:8888`, grant = shell + diagnostics taunt (no flag) | `challenges/auth_service/setup.sh` |
 | SUID diag (privesc) | — (SUID binary) | root (`4755`) | `/opt/helix/helix-diag`, flag in `/root/root.flag` (`0600`) | `challenges/auth_service/setup.sh` |
 | Secure vault (crypto) | `helix-vault.service` | `vaultsvc` | `:9000`, server `root:vaultsvc` `0750` | `challenges/vault/setup.sh` |
 | Docker network lab | `ctf-network.service` | root (containers) | FTP `:2121`, web `:8080`, ssh `:2222`, redis `:6379`, SNMP `:1610/udp` — published on all host interfaces, so players use `<vm-ip>:<port>`; the `10.20.30.x` container IPs are internal only | compose tree synced to `/opt/network` by hand; unit installed by `setup_vm.sh` |

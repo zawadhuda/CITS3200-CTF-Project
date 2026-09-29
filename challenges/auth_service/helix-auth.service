@@ -4,9 +4,8 @@ After=network.target
 
 [Service]
 User=authsvc
-# Flag lives ONLY in the live service environment — never on disk, never in
-# the player-reversible binary copy. See challenges/auth_service/README.md.
-Environment=FLAG=helix{re_auth-service-backdoor}
+# No flag here by design: a grant yields a shell plus a nudge, and the
+# chain's flag waits at real root. See challenges/auth_service/README.md.
 ExecStart=/opt/helix/auth_service --serve
 Restart=always
 RestartSec=5

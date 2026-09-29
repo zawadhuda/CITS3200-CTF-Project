@@ -3,11 +3,11 @@
 **Owner:** Zawad. Self-contained root path #3. Demoable end-to-end without any
 other member's code.
 
-## What it covers (one chain, four requirement slots)
-| Stage | Category | Flag |
+## What it covers (one chain, flag at the end only)
+| Stage | Category | Payoff |
 |---|---|---|
-| Pull + reverse `auth_service` → keygen → shell as `authsvc` | **RE** + network foothold | `helix{re_auth-service-backdoor}` |
-| SUID `helix-diag` PATH hijack → root | **vertical** privesc | `helix{vert_suid-binary-authsvc}` |
+| Pull + reverse `auth_service` → keygen → shell as `authsvc` | **RE** + network foothold | shell + diagnostics taunt nudging at the next step (no flag) |
+| SUID `helix-diag` PATH hijack → root | **vertical** privesc | `helix{vert_suid-binary-authsvc}` (submitted) |
 
 Pairs with the padding-oracle vault (advanced/crypto) to form your full
 individual contribution: RE + crypto + a distinct root path, all beyond the
@@ -25,13 +25,14 @@ gcc -O1 -fno-stack-protector -o auth_service auth_service.c
 gcc -O1 -Wno-unused-result -o helix-diag helix-diag.c
 ```
 
-## Deploy (VM — Yash / Claude Code)
+## Deploy (VM — automated by `setup.sh`; manual equivalent below)
 - Run `auth_service --serve` as a systemd service under a dedicated **`authsvc`**
-  user, `FLAG=helix{re_auth-service-backdoor}` in the unit's `Environment=`.
+  user (see `helix-auth.service` — no flag env; a grant prints a taunt).
   Confirm `:8888` is listed in the REC-3 dev-infra page.
-- Distribute a **flagless** copy of `auth_service` for players to pull (via the
-  FTP box / backup share). Do NOT set FLAG when producing that copy — the binary
-  reads FLAG at runtime, so the pulled copy has no flag string in it.
+- Distribute a copy of `auth_service` for players to pull (via the
+  FTP box / backup share). The binary carries no secret either way — the
+  code is derived from the username by the algorithm, so there is nothing
+  to `strings` out of it.
 - Install the privesc target:
   ```
   cp helix-diag /opt/helix/helix-diag
@@ -46,17 +47,16 @@ gcc -O1 -Wno-unused-result -o helix-diag helix-diag.c
 2. Read the loop: seed `0x1505`, per byte `code = code*33 ^ (byte*0x9e)`, mask to
    48 bits, final `xor 0xc0ffee1234`. Reimplement (`keygen.py`).
 3. `nc <host> 8888`, send a username + the computed hex code → shell as `authsvc`
-   + first flag.
+   + diagnostics taunt pointing at the next step (no flag here).
 4. On the box: notice `helix-diag` is SUID-root; `strings`/objdump shows it calls
    `netcheck` unqualified. Plant a malicious `netcheck`, prepend to `$PATH`, run
-   it → root + second flag. (`privesc.sh` automates this.)
+   it → root + submitted flag. (`privesc.sh` automates this.)
 
 ## Why it scores on the difficulty rubric
 - **RE stage resists `strings` and patching.** No plaintext secret — the secret
-  is the *algorithm*. And because the flag lives only on the live `:8888`
-  service (runtime `FLAG` env), flipping the compare in a local copy yields
-  nothing; players must recover the real transform. That defeats the standard
-  "patch the jne" shortcut.
+  is the *algorithm*. Flipping the compare in a local copy yields no shell;
+  players must recover the real transform and submit a valid code to the
+  live service. That defeats the standard "patch the jne" shortcut.
 - **Privesc resists linpeas auto-exploit.** It's a custom SUID binary, not a
   GTFOBins entry — scanners flag the SUID bit but can't auto-own it; you must
   read the binary and stage the hijack.
@@ -70,8 +70,8 @@ gcc -O1 -Wno-unused-result -o helix-diag helix-diag.c
 - Read the constants off the asm: `mov $0x1505` (seed), `shl $5 + add` = ×33,
   `imul $0x9e` (per-byte), `and $0xffffffffffff` (48-bit), `xor $0xc0ffee1234`
   (fold). Be able to point at each instruction.
-- Why patching doesn't win: the flag is only in the live service's environment,
-  so a locally-patched "always accept" copy has no flag to print.
+- Why patching doesn't win: a locally-patched "always accept" copy yields no
+  shell on the live box — only a valid code submitted to `:8888` does.
 
 **Privesc stage**
 - Why SUID matters: the binary runs with the owner's (root's) euid, so anything

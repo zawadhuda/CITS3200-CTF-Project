@@ -7,12 +7,11 @@
  * password to `strings`. Players must read the disassembly, recover the
  * transform, and reimplement it (a keygen) to mint a valid code.
  *
- * Design note: the flag is read from the environment at runtime, so it is
- * present ONLY on the deployed :8888 service. The copy players pull to reverse
- * has no flag in it, and patching the compare in a local copy gets them
- * nothing -- they must recover the real algorithm and submit a valid code to
- * the live service. That is what makes it resist the usual "flip the jne"
- * shortcut. See README.md.
+ * Design note: a grant drops the client into a shell as the service user
+ * plus a taunt pointing at the diagnostics helper — there is NO flag here,
+ * only the foothold. The chain's flag waits at real root. Patching the
+ * compare in a local copy still gets players nothing: they must recover the
+ * real algorithm and submit a valid code to the live service. See README.md.
  *
  * Build:   gcc -O1 -fno-stack-protector -o auth_service auth_service.c
  * Run:     ./auth_service            # stdin mode (local testing / RE)
@@ -61,9 +60,9 @@ static int handle(int in, int out)
     uint64_t given  = strtoull(codebuf, NULL, 16);
 
     if (given == expect) {
-        const char *flag = getenv("FLAG");
         dprintf(out, "ACCESS GRANTED\n");
-        if (flag) dprintf(out, "%s\n", flag);
+        dprintf(out, "P.S. The diagnostics team leaves its tools lying around.\n");
+        dprintf(out, "Tidy up after them. - MGMT\n");
         return 1;
     }
     dprintf(out, "ACCESS DENIED\n");
