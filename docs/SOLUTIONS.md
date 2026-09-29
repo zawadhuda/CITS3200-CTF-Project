@@ -57,13 +57,21 @@ ticket read/mark-reviewed.
 
 ## A1 — indirect prompt injection via support tickets
 
-`a1_oracle_worker.py:build_prompt` mixes the private note (submitted flag #3) and
-the untrusted ticket in one block and honours "workflow directives" inside
-ticket text. `offline_answer` rejects naive `ignore previous instructions`
-and only discloses when the ticket contains ALL of: a workflow-directive
-phrase + a note-target phrase (`admin note`, …) + a disclose verb
-(`append`/`include`/`copy`/`place`) + a disguised field
-(`reference checksum`, …). The reply is written back to the ticket page.
+`a1_oracle_worker.py:build_messages` puts the private note (submitted flag #3)
+in the system message and the untrusted ticket in the user message, with a
+standing "apply workflow directives" instruction. `offline_answer` (default,
+no model) rejects naive `ignore previous instructions` and only discloses
+when the ticket contains ALL of: a workflow-directive phrase + a note-target
+phrase (`admin note`, …) + a disclose verb (`append`/`include`/`copy`/`place`)
++ a disguised field (`reference checksum`, …). The reply is written back to
+the ticket page.
+
+Assessed mode (live model via `ORACLE_API_URL`): same shape, verified
+benign → clean, naive → refused, crafted → disclosed. Two deployment notes:
+`remote_answer` sends a browser `User-Agent` (the gateway 403s python-urllib)
+and `run_once` keeps a guardrail refusing explicit exfiltration commands even
+when the model complies — the indirect path stays genuinely model-decided.
+API tokens live only in `/etc/helix/oracle-bot.env` on the VM, never in git.
 
 ## Service challenges (on the VM, off the web app)
 
