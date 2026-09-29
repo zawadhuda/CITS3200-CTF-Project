@@ -2,6 +2,7 @@
 set -eu
 
 challenge_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+workers_dir="$challenge_dir/../workers"
 flag_dir=/opt/helix/flags
 bot_dir=/opt/helix/bots
 config_dir=/etc/helix
@@ -38,8 +39,8 @@ chown root:w3-bot "$flag_dir/w3.txt"
 chown root:oracle-bot "$flag_dir/a1.txt"
 chmod 0640 "$flag_dir/w3.txt" "$flag_dir/a1.txt"
 
-install -o root -g w3-bot -m 0750 "$challenge_dir/w3_admin_bot.py" "$bot_dir/w3_admin_bot.py"
-install -o root -g oracle-bot -m 0750 "$challenge_dir/a1_oracle_worker.py" "$bot_dir/a1_oracle_worker.py"
+install -o root -g w3-bot -m 0750 "$workers_dir/w3_admin_bot.py" "$bot_dir/w3_admin_bot.py"
+install -o root -g oracle-bot -m 0750 "$workers_dir/a1_oracle_worker.py" "$bot_dir/a1_oracle_worker.py"
 
 # The application receives only worker keys. It never receives either flag.
 cat > "$config_dir/app-challenges.env" <<'EOF'
