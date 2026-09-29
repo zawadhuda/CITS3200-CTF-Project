@@ -30,3 +30,11 @@ order (flag → hint to the next stage) without breaking chains:
    yields a login (the session is the clue to `.hpf`/deserialisation).
 
 Never demote #5, #6, or #7: each is the sole payoff of its root path.
+
+## Keys (not flags — never submitted)
+
+| Key | Value | Lives in | Consumed by |
+|---|---|---|---|
+| HPF restore token | `helix-hpf-restore-7f3a` | `/root/profile-token.txt` (`0600`) in the redis container (docker-root loot) → `HELIX_HPF_TOKEN` in `/etc/helix/app-challenges.env` (`root:svc-web-prod`, `0640`) | `X-Profile-Token` header on `/profile/import`; gates the W2 deserialiser |
+| Review key | `helix-review-6b8cb1e89e04` | `/etc/helix/{app-challenges,w3-bot}.env` | bot ticket polling |
+| Oracle worker key | `helix-oracle-3af705c1d294` | `/etc/helix/{app-challenges,oracle-bot}.env` | oracle ticket polling |

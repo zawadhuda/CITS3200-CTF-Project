@@ -10,6 +10,10 @@ services:
     build: ./hosts/ftp-recon
     container_name: ftp-recon
     hostname: ftp-recon
+    # Player-visible docker-host IP (e.g. 192.168.56.x). Required for
+    # passive FTP to work off-host; the entrypoint rewrites pasv_address.
+    environment:
+      - PASV_ADDRESS=${PASV_ADDRESS:-}
     networks:
       ctf-net:
         ipv4_address: 10.20.30.41

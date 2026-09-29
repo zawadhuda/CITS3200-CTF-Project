@@ -57,6 +57,10 @@ cat > "$config_dir/app-challenges.env" <<EOF
 HELIX_SECRET=$helix_secret
 HELIX_REVIEW_KEY=helix-review-6b8cb1e89e04
 HELIX_ORACLE_WORKER_KEY=helix-oracle-3af705c1d294
+# Restore token for /profile/import. Static build constant, identical to
+# network/hosts/redis-host/profile-token.txt (docker-root loot). A key, not
+# a flag: it gates the deserialiser, nothing is submitted for it.
+HELIX_HPF_TOKEN=helix-hpf-restore-7f3a
 EOF
 chown root:svc-web-prod "$config_dir/app-challenges.env"
 chmod 0640 "$config_dir/app-challenges.env"

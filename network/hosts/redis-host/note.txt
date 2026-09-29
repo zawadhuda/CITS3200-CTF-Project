@@ -1,0 +1,13 @@
+If you're reading this, you owned the cache box. Enjoy it — but this
+isn't where the real root is.
+
+The actual crown jewels live on the Helix corporate portal:
+
+    http://192.168.56.x:5000/
+
+Get yourself an employee session there (the login page leaks more than it
+should), then look at the profile restore feature. It won't accept your
+backup without the restore token sitting next to this note
+(profile-token.txt) — send it as the X-Profile-Token header.
+
+Incident ref, in case anyone asks: PRM-403-9182.

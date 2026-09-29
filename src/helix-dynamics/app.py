@@ -335,6 +335,14 @@ def load_profile_package(raw):
 @app.route("/profile/import", methods=["POST"])
 @login_required
 def profile_import():
+    # Restore authorisation: the .hpf restore token is loot from the
+    # network-lab path (container root). Checked BEFORE the upload is
+    # decoded, so the deserialiser is unreachable without it.
+    expected = os.environ.get("HELIX_HPF_TOKEN", "")
+    provided = request.headers.get("X-Profile-Token", "")
+    if not expected or not secrets.compare_digest(provided, expected):
+        flash("Invalid profile token.", "err")
+        return redirect(url_for("profile"))
     f = request.files.get("profile")
     if not f:
         flash("No file provided.", "err")

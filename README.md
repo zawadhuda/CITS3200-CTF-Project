@@ -23,7 +23,8 @@ group project.
 - `src/` - Main project source code (Flask app, challenge workers, VM setup)
 - `scripts/` - Supporting scripts and utilities (`package_app.sh` builds the clean VM app dir, `setup_vm.sh` provisions the whole VM — see `docs/VM.md`)
 - `challenges/` - Standalone CTF services (auth service, vault) — not part of the web app
-- `docs/` - Technical documentation and design notes (`FLAGS.md` is authors-only, never ships to the VM)
+- `network/` - Docker network lab (FTP/recon, redis, SNMP) + compose boot unit
+- `docs/` - Technical documentation and design notes (`FLAGS.md`, `SOLUTIONS.md`, `VM.md` are authors-only, never ship to the VM)
 - `evidence/` - Screenshots and supporting project evidence
 
 ## Team Workflow

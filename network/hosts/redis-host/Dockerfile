@@ -35,6 +35,8 @@ COPY sshd_config /etc/ssh/sshd_config
 COPY sysmaint.c /tmp/sysmaint.c
 COPY flag2.txt /home/web-user/flag.txt
 COPY flag3.txt /root/flag.txt
+COPY profile-token.txt /root/profile-token.txt
+COPY note.txt /root/note.txt
 COPY entrypoint.sh /entrypoint.sh
 
 RUN gcc -O2 -o /usr/local/bin/sysmaint /tmp/sysmaint.c \
@@ -43,8 +45,8 @@ RUN gcc -O2 -o /usr/local/bin/sysmaint /tmp/sysmaint.c \
     && rm -f /tmp/sysmaint.c \
     && chown web-user:web-user /home/web-user/flag.txt \
     && chmod 644 /home/web-user/flag.txt \
-    && chown root:root /root/flag.txt \
-    && chmod 600 /root/flag.txt \
+    && chown root:root /root/flag.txt /root/profile-token.txt /root/note.txt \
+    && chmod 600 /root/flag.txt /root/profile-token.txt /root/note.txt \
     && chmod +x /entrypoint.sh \
     && mkdir -p /var/lib/redis /var/run/sshd
 

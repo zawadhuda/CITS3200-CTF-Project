@@ -14,10 +14,18 @@
 | Auth service (RE) | `helix-auth.service` | `authsvc` | `:8888`, flag in unit `Environment=FLAG` | `challenges/auth_service/setup.sh` |
 | SUID diag (privesc) | — (SUID binary) | root (`4755`) | `/opt/helix/helix-diag`, flag in `/root/root.flag` (`0600`) | `challenges/auth_service/setup.sh` |
 | Secure vault (crypto) | `helix-vault.service` | `vaultsvc` | `:9000`, server `root:vaultsvc` `0750` | `challenges/vault/setup.sh` |
+| Docker network lab | `ctf-network.service` | root (containers) | FTP `:2121`, web `:8080`, ssh `:2222`, redis `:6379`, SNMP `:1610/udp` | compose tree synced to `/opt/network` by hand; unit installed by `setup_vm.sh` |
 
-Bots `Require=flaskapp.service` and restart after it; auth/vault are
-independent. Everything is reachable immediately after boot — no manual
+Bots `Require=flaskapp.service` and restart after it; auth/vault/docker-lab
+are independent. Everything is reachable immediately after boot — no manual
 staging per challenge.
+
+Intended play order: nmap → docker lab (pcap → dev-infra → redis →
+`web-user` → SNMP → sysmaint → container root) → breadcrumb + restore
+token → webapp (`/login` SQLi → Charlie → token-gated `.hpf` import → RCE
+as `svc-web-prod`) → `:8888` RE → `authsvc` → SUID `helix-diag` → real
+VM root. Either half is scannable first, but RCE is unreachable without
+the docker-root token.
 
 ## Build steps
 
@@ -33,6 +41,18 @@ Transfer (as `sys-user` — bundle layout preserved so `setup_vm.sh` finds it):
 ```sh
 scp -r /tmp/app sys-user@192.168.56.x:/tmp/app
 scp -r scripts src challenges sys-user@192.168.56.x:/tmp/helix-src/
+```
+
+Sync the docker tree by hand (it stays yours to manage):
+
+```sh
+scp -r network sys-user@192.168.56.x:/tmp/helix-network/
+# on the VM as root:
+rm -rf /opt/network && mv /tmp/helix-network /opt/network
+chown -R root:root /opt/network && chmod -R go-rwx /opt/network
+# set PASV_ADDRESS to the VM's player-visible IP for off-host passive FTP
+# (via override, since the unit ships without it):
+#   systemctl edit ctf-network.service   # add: [Service] / Environment=PASV_ADDRESS=192.168.56.x
 ```
 
 VM (as root, one command):

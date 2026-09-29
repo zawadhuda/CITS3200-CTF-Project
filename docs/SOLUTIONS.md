@@ -24,13 +24,20 @@ three rows are random). The cracked plaintext IS flag #1 and also logs in
 as Charlie, unlocking the dashboard/`.hpf` stages. Auth bypass via
 `' OR '1'='1` must NOT work (parameterised) — regression-test this.
 
-## W2 — insecure deserialisation at `/profile/import`
+## W2 — insecure deserialisation at `/profile/import` (docker-gated)
 
 `/profile/export` returns `base64(pickle(dict))`. `/profile/import` calls
-`pickle.loads` on the upload (JSON fallback only). Any authenticated
-session (via WEB-1) can upload a pickle whose `__reduce__` runs code as
-`svc-web-prod` → shell → read `/opt/helix/flags/w2.txt` (flag #2,
-`root:svc-web-prod`, `0640`).
+`pickle.loads` on the upload (JSON fallback only) — but only after the
+`X-Profile-Token` header matches `HELIX_HPF_TOKEN`. The token is loot from
+the network-lab path only (`/root/profile-token.txt` in the redis
+container, `0600`): without docker root the deserialiser is unreachable,
+so pre-docker RCE is impossible by construction. Authenticated session
+(via WEB-1) + token + pickle `__reduce__` → code as `svc-web-prod` →
+shell → read `/opt/helix/flags/w2.txt` (flag #2, `root:svc-web-prod`,
+`0640`). Missing/wrong token yields the distinct `Invalid profile token`
+error (never the generic `Invalid .hpf file`) — regression-test all three
+cases: no header + valid pickle must NOT execute; wrong token must NOT
+execute; correct token + evil pickle must execute.
 
 ## W3 — stored DOM-XSS in administrator ticket review
 
