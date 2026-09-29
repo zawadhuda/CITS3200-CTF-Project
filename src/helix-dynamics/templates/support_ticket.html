@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Ticket #{{ ticket.id }} — Helix Dynamics{% endblock %}
+{% block content %}
+<div class="container dash">
+  <p class="eyebrow">Support ticket #{{ ticket.id }}</p>
+  <h2>{{ ticket.subject }}</h2>
+  <div class="card" style="margin-top:24px">
+    <h3>Submitted report</h3>
+    <p style="white-space:pre-wrap">{{ ticket.body }}</p>
+  </div>
+
+  <div class="panel wide" style="margin:24px 0">
+    <h3>Oracle response</h3>
+    {% if ticket.oracle_reply %}
+      <div class="chat"><div class="msg bot"><span class="who">Oracle</span>{{ ticket.oracle_reply }}</div></div>
+    {% else %}
+      <p class="muted">Oracle is still processing this ticket.</p>
+    {% endif %}
+  </div>
+
+  {% if report %}
+  <div class="note warn">
+    <strong>Browser diagnostic:</strong>
+    <span class="mono">{{ report.captured_data }}</span>
+  </div>
+  {% endif %}
+  <p><a href="{{ url_for('support') }}">← Back to support</a></p>
+</div>
+{% endblock %}

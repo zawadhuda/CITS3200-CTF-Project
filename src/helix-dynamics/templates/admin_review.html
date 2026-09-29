@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Helix Internal Review</title>
+</head>
+<body>
+  <h1 id="ticket-title">Loading ticket...</h1>
+  <div id="ticket-body"></div>
+  <script>
+    fetch('/internal/ticket-data/{{ ticket_id }}?key={{ review_key }}')
+      .then(response => response.json())
+      .then(ticket => {
+        document.getElementById('ticket-title').textContent = ticket.subject;
+        document.getElementById('ticket-body').innerHTML = ticket.body;
+      });
+  </script>
+</body>
+</html>
