@@ -1,8 +1,8 @@
 # ftp-recon (10.20.30.41) — N1
 # Anonymous vsftpd exposing a captured pcap that leaks HTTP Basic-auth
 # creds and an SNMP community string. Also serves the basic-auth-protected
-# basic-auth-protected /dev-infra-backup/ dir those creds unlock, purely so
-# the pcap's request/response is grounded in something real on the wire.
+# /dev-infra-backup/ dir those creds unlock, purely so the pcap's
+# request/response is grounded in something real on the wire.
 FROM debian:bookworm-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -20,6 +20,7 @@ COPY web/dev-infra-backup/ /var/www/dev-infra-backup/
 COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod -R a+rX /srv/ftp /var/www/dev-infra-backup \
+    && chmod 644 /etc/nginx/.htpasswd \
     && chmod +x /entrypoint.sh \
     && rm -f /etc/nginx/sites-enabled/default.orig
 
