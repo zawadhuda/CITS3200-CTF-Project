@@ -1,0 +1,11 @@
+# Hypervisor-independent guest DHCP: every attached NIC (NAT or host-only)
+# gets a DHCP lease on any hypervisor (VirtualBox enp0s*, VMware ens*,
+# Hyper-V eth*, KVM enp*, USB enx*). Installed by scripts/setup_vm.sh;
+# /etc/network/interfaces keeps loopback only. docker*/veth*/br-* never
+# match, so the lab bridge is untouched.
+[Match]
+Name=en* eth*
+
+[Network]
+DHCP=yes
+IPv6AcceptRA=yes

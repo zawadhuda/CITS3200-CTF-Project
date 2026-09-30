@@ -52,6 +52,28 @@ sh "$repo/challenges/r2-activation/setup.sh"
 # --- Local horizontals (need svc-web-prod/sys-user/remote-ops; assert inside) ---
 sh "$repo/challenges/horizontal/setup.sh"
 
+# --- Hypervisor-independent guest DHCP (NAT + host-only, any hypervisor) ---
+# A wildcard networkd profile manages every physical NIC; ifupdown keeps
+# loopback only so the two stacks never fight over the same lease.
+install -o root -g root -m 0644 "$repo/network/10-dhcp.network" \
+    /etc/systemd/network/10-dhcp.network
+if grep -Eq '^\s*(auto|allow-hotplug|iface)\s+(enp|ens|eth)' \
+    /etc/network/interfaces 2>/dev/null; then
+    cp -a /etc/network/interfaces /root/interfaces.setup-backup
+    printf '%s\n' \
+        '# This file describes the network interfaces available on your system' \
+        '# and how to activate them. For more information, see interfaces(5).' \
+        '' \
+        'source /etc/network/interfaces.d/*' \
+        '' \
+        '# The loopback network interface' \
+        'auto lo' \
+        'iface lo inet loopback' \
+        > /etc/network/interfaces
+    echo "Trimmed /etc/network/interfaces to loopback (backup at /root/interfaces.setup-backup)"
+fi
+systemctl enable --now systemd-networkd
+
 # --- Docker network lab (lives at /opt/network, managed by hand) ---
 # The compose tree is synced there separately; here we only install the
 # boot unit so the lab comes up with the VM.
@@ -64,9 +86,11 @@ if [ -d /opt/network ]; then
     install -o root -g root -m 0644 "$repo/network/ctf-pasv-detect.service" \
         /etc/systemd/system/ctf-pasv-detect.service
     mkdir -p /etc/systemd/system/ctf-network.service.d
+    # Dash-prefixed EnvironmentFile: if detection ever fails, the lab still
+    # starts (degraded FTP PASV) instead of failing the whole unit.
     printf '%s\n' '[Unit]' 'Wants=ctf-pasv-detect.service' \
         'After=ctf-pasv-detect.service' '' '[Service]' \
-        'EnvironmentFile=/run/ctf-pasv.env' \
+        'EnvironmentFile=-/run/ctf-pasv.env' \
         > /etc/systemd/system/ctf-network.service.d/pasv.conf
 else
     echo "WARNING: /opt/network missing, skipping ctf-network.service" >&2
