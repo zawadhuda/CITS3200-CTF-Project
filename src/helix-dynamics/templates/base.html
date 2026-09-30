@@ -20,7 +20,11 @@
       <a href="/about">Company</a>
       <a href="/careers">Careers</a>
       <a href="/support">Support</a>
+      {% if session.get('uid') %}
+      <a class="cta" href="/dashboard">Dashboard</a>
+      {% else %}
       <a class="cta" href="/login">Employee Login</a>
+      {% endif %}
     </div>
   </div>
 </nav>
