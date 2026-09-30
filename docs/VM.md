@@ -70,9 +70,9 @@ scp -r network sys-user@<vm-ip>:/tmp/helix-network/
 # on the VM as root:
 rm -rf /opt/network && mv /tmp/helix-network /opt/network
 chown -R root:root /opt/network && chmod -R go-rwx /opt/network
-# set PASV_ADDRESS to the VM's player-visible IP for off-host passive FTP
-# (via override, since the unit ships without it):
-#   systemctl edit ctf-network.service   # add: [Service] / Environment=PASV_ADDRESS=<vm-ip>  (from `ip -4 addr`)
+# No PASV_ADDRESS step: setup installs ctf-pasv-detect (host-only IP
+# auto-detected at boot into /run/ctf-pasv.env). Manual override only if
+# the heuristic ever picks wrong: systemctl edit ctf-network.service.
 ```
 
 VM (as root, one command):

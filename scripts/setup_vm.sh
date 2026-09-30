@@ -58,6 +58,16 @@ sh "$repo/challenges/horizontal/setup.sh"
 if [ -d /opt/network ]; then
     install -o root -g root -m 0644 "$repo/network/ctf-network.service" \
         /etc/systemd/system/ctf-network.service
+    # Passive-FTP address auto-detection (host-only IP at boot, any hypervisor).
+    install -o root -g root -m 0755 "$repo/network/ctf-pasv-detect.sh" \
+        /usr/local/sbin/ctf-pasv-detect.sh
+    install -o root -g root -m 0644 "$repo/network/ctf-pasv-detect.service" \
+        /etc/systemd/system/ctf-pasv-detect.service
+    mkdir -p /etc/systemd/system/ctf-network.service.d
+    printf '%s\n' '[Unit]' 'Wants=ctf-pasv-detect.service' \
+        'After=ctf-pasv-detect.service' '' '[Service]' \
+        'EnvironmentFile=/run/ctf-pasv.env' \
+        > /etc/systemd/system/ctf-network.service.d/pasv.conf
 else
     echo "WARNING: /opt/network missing, skipping ctf-network.service" >&2
 fi
@@ -66,6 +76,9 @@ fi
 systemctl daemon-reload
 systemctl enable flaskapp.service helix-w3-bot.service helix-oracle-worker.service \
     helix-auth.service helix-vault.service
+if [ -f /etc/systemd/system/ctf-pasv-detect.service ]; then
+    systemctl enable ctf-pasv-detect.service
+fi
 if [ -f /etc/systemd/system/ctf-network.service ]; then
     systemctl enable ctf-network.service
 fi
