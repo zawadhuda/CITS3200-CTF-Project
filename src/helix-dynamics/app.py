@@ -373,7 +373,10 @@ def dev_infra():
     if not check_basic(auth):
         return Response("Authentication required.", 401,
                         {"WWW-Authenticate": 'Basic realm="Helix Dev Infra"'})
-    return render_template("dev_infra.html")
+    # Service addresses follow this host: the VM's address is DHCP-allocated,
+    # so nothing here may hardcode an IP. Jinja autoescapes `host`.
+    return render_template("dev_infra.html",
+                           host=request.host.split(":")[0])
 
 
 if __name__ == "__main__":
