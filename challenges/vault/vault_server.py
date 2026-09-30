@@ -71,7 +71,11 @@ def _oracle(blob: bytes) -> str:
         return "ERR 0x01 unseal-failed"          # <-- invalid padding
     if not pt.startswith(_MAGIC):
         return "ERR 0x02 malformed-token"         # <-- valid padding, wrong body
-    return "OK vault-open " + pt.decode(errors="replace")
+    # NOTE: success echoes nothing but the status. Echoing the plaintext
+    # here would let a client replay the TOKEN blob straight to the flag
+    # with no oracle attack, so the only path to the secret is decryption
+    # via the ERR 0x01/0x02 side channel.
+    return "OK vault-open"
 
 
 BANNER = (b"HELIX SECURE VAULT v2.3\r\n"

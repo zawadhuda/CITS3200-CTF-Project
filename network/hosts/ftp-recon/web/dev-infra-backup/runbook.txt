@@ -3,8 +3,9 @@ internal dev-infra notes — do not publish
 
 - redis on the app-cache box is still running with the vendor defaults from
   the POC. ops ticket INFRA-482 to lock it down has been open for 3 sprints.
-- monitoring pulls metrics via SNMP from the older boxes. community string
-  is the same one everyone's used since the research_dev spike branch.
+- monitoring pulls metrics via SNMP (udp/1610 on the docker host) from the
+  older boxes. community string is the same one everyone's used since the
+  research_dev spike branch.
 - mysqldump cron on the backup box still takes -p on the command line
   instead of a defaults-extra-file. yes, we know. INFRA-511.
 
