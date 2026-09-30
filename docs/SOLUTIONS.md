@@ -98,6 +98,19 @@ dev-infra → unauth Redis `CONFIG SET` SSH write → `web-user` shell →
 SUID `sysmaint` password → container root → `/root/flag.txt` (submitted
 flag #4) + restore token + breadcrumb → webapp chain.
 
+## Local-account challenges (hint loot, no flags)
+
+- **Logic gate** (`/home/sys-user/logic_gate`, solved as `sys-user`):
+  `HELIX_SEED` must equal `((0x5EED * 2) ^ 0x1234) - 0x777 + 42` = `43169`
+  (Ghidra/objdump the constants; `strings` yields nothing — XOR-obfuscated).
+  Output is a hint toward the `remote-ops` hop, not a flag.
+- **R2 activation** (`/home/remote-ops/{activate.pyc,archive.zip}`, solved
+  as `remote-ops`): decompile the `.pyc`, reimplement `derive_key`
+  (`sha256("helix-research:PRM-403-9182:activation")` slices → `HELIX-…`
+  license key; incident ID finally earns its keep), unlock the archive
+  (`md5(key)[:12]`), read the memo hint toward the diag finale. Players get
+  `.pyc` + zip only — never `activate.py`/`build_archive.py`.
+
 ## Pre-ship checklist
 
 1. `sh scripts/package_app.sh /tmp/app` passes its self-check.
