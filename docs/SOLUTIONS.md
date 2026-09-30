@@ -98,6 +98,19 @@ dev-infra → unauth Redis `CONFIG SET` SSH write → `web-user` shell →
 SUID `sysmaint` password → container root → `/root/flag.txt` (submitted
 flag #4) + restore token + breadcrumb → webapp chain.
 
+## Local horizontals (no sudo, nudges only, no flags)
+
+- **Hop 1 — `svc-web-prod` → `sys-user`**: sloppy backup at
+  `/srv/backups/sys-user/sys-user_backup_key` (`0644`) + `ssh -i`.
+  The key carries passphrase `dragon` (top-wordlist — `ssh2john` + crack,
+  echoing the Alice entry). Appended public half lives in
+  `~sys-user/.ssh/authorized_keys`.
+- **Hop 2 — `sys-user` → `remote-ops`**: group-gated SUID
+  (`/opt/helix/ops-report`, `4750 remote-ops:sys-user`) interpolates its
+  title argument into a shell command — `;id` / `$(…)` executes as
+  `remote-ops` (pointed at by the logic-gate hint). `svc-web-prod` is denied
+  (no skipping). No `sudo` exists anywhere on this path.
+
 ## Local-account challenges (hint loot, no flags)
 
 - **Logic gate** (`/home/sys-user/logic_gate`, solved as `sys-user`):

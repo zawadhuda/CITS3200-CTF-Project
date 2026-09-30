@@ -49,6 +49,9 @@ sh "$repo/challenges/vault/setup.sh"
 sh "$repo/challenges/logic-gate/setup.sh"
 sh "$repo/challenges/r2-activation/setup.sh"
 
+# --- Local horizontals (need svc-web-prod/sys-user/remote-ops; assert inside) ---
+sh "$repo/challenges/horizontal/setup.sh"
+
 # --- Docker network lab (lives at /opt/network, managed by hand) ---
 # The compose tree is synced there separately; here we only install the
 # boot unit so the lab comes up with the VM.

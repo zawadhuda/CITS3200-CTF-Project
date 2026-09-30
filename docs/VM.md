@@ -16,6 +16,7 @@
 | Secure vault (crypto) | `helix-vault.service` | `vaultsvc` | `:9000`, server `root:vaultsvc` `0750` | `challenges/vault/setup.sh` |
 | Logic gate (local RE) | — (binary in home) | solved as `sys-user` | `/home/sys-user/logic_gate` (`0755`, home `0750`) → hint, no flag | `challenges/logic-gate/setup.sh` (builds on VM, `-O0` no strip) |
 | R2 activation (local RE) | — (`.pyc` + locked zip in home) | solved as `remote-ops` | `/home/remote-ops/{activate.pyc,archive.zip}` (`0644`, home `0750`) → memo hint, no flag | `challenges/r2-activation/setup.sh` (compiles on VM for version match) |
+| Horizontals (no sudo) | — (SUID binary) | `svc-web-prod` → `sys-user` → `remote-ops` | key backup `/srv/backups/sys-user/` (`0644`); SUID `/opt/helix/ops-report` (`4750 remote-ops:sys-user`) → nudges, no flags | `challenges/horizontal/setup.sh` |
 | Docker network lab | `ctf-network.service` | root (containers) | FTP `:2121`, web `:8080`, ssh `:2222`, redis `:6379`, SNMP `:1610/udp` — published on all host interfaces, so players use `<vm-ip>:<port>`; the `10.20.30.x` container IPs are internal only | compose tree synced to `/opt/network` by hand; unit installed by `setup_vm.sh` |
 
 The VM takes its address from the hypervisor's host-only DHCP server, so
