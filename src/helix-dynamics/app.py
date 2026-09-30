@@ -42,7 +42,7 @@ ORACLE_WORKER_KEY = os.environ.get(
 
 # --- Basic Auth for the dev infrastructure page ---
 DEV_USER = "devops"
-DEV_PASS = "helixbuild2026"
+DEV_PASS = "R3dacted_But_Weak!"
 
 
 def db():
