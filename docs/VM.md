@@ -23,6 +23,19 @@ The VM takes its address from the hypervisor's host-only DHCP server, so
 there is no fixed IP: `<vm-ip>` below means whatever `ip -4 addr` reports
 on the VM.
 
+## Guest networking (hypervisor-independent DHCP)
+
+The guest uses `systemd-networkd` with a single wildcard profile
+(`/etc/systemd/network/10-dhcp.network`, `Match Name=en* eth*`,
+`DHCP=yes`, `IPv6AcceptRA=yes`), so every attached NIC — NAT or host-only —
+gets a DHCP lease on any hypervisor (VirtualBox `enp0s*`, VMware `ens*`,
+Hyper-V `eth*`, KVM `enp*`, USB `enx*`) with zero guest changes.
+`/etc/network/interfaces` holds loopback only (original NIC stanzas kept at
+`/root/interfaces.vbox-backup`); `docker*`/`veth*`/`br-*` never match the
+profile, so the lab bridge is untouched. All challenge services bind
+`0.0.0.0`, so no vuln depends on interface names or lease order.
+Per import, still set `PASV_ADDRESS=<vm-ip>` (see below) for off-host FTP.
+
 Bots `Require=flaskapp.service` and restart after it; auth/vault/docker-lab
 are independent. Everything is reachable immediately after boot — no manual
 staging per challenge.
@@ -79,6 +92,7 @@ flags, and solvers).
 systemctl is-active flaskapp.service helix-w3-bot.service helix-oracle-worker.service helix-auth.service helix-vault.service
 journalctl -u flaskapp.service --no-pager | tail -5   # no traceback, no debugger PIN
 ss -ltn | grep -E ':(5000|8888|9000|2121|8080|2222|6379|1610)'   # web, services, docker
+networkctl status | head -8   # both NICs routable via 10-dhcp.network, one DHCP lease each
 # player view: http://<vm-ip>:5000/ + :5000/login UNION probe
 # docker view (same host): ftp <vm-ip>:2121, redis <vm-ip>:6379
 ```
