@@ -25,6 +25,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 #    directory with "Permission denied" — confirmed via sshd -d debug
 #    output during live testing. Not just a realism nit; without this the
 #    foothold silently never works even with a perfectly valid key on disk.
+#  - the Redis-written authorized_keys keeps its RDB framing bytes and lands
+#    root-owned 644 inside the 700 user-owned dir. Both are fine: sshd skips
+#    the framing as malformed lines and StrictModes accepts root-owned
+#    files here — do NOT "fix" ownership/format during tidying, and do not
+#    pre-create authorized_keys (an existing file changes nothing, but an
+#    empty/missing one keeps the pre-exploit state clean for `CONFIG SET`
+#    probing).
 RUN useradd -m -s /bin/bash web-user \
     && echo 'web-user:redisctf' | chpasswd \
     && mkdir -p /home/web-user/.ssh \
