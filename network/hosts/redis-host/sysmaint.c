@@ -34,6 +34,9 @@ int main(void) {
     }
 
     printf("Password accepted. Dropping into maintenance shell as root.\n");
+    fflush(stdout); /* execl() never returns, so flush now: without this a
+                     * piped (non-tty) run prints nothing on success and a
+                     * correct password is indistinguishable from a hang. */
     if (setgid(0) != 0 || setuid(0) != 0) {
         perror("setuid/setgid");
         return 1;
