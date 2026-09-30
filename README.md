@@ -1,66 +1,32 @@
-# CITS3006 CTF Project
+# CITS3006 CTF Project — Helix Dynamics
 
-Repository for our CITS3006 Penetration Testing group project.
+Vulnerable corporate portal + Docker network lab + local privilege-escalation
+chain, packaged as a VirtualBox OVA for the CITS3006 penetration-testing
+group project. Group report: `CITS3006-Report.md`.
 
 ## Team
 
-| Member | GitHub Username | Responsibilities |
-|---|---|---|
-| Zawad | @zawadhuda | TBD |
-| Michael Ang | TBD | TBD |
-| Dhava Wikhananda Adhi | TBD | TBD |
-| Hamish Haslam | TBD | TBD |
-| Yashwardhan | TBD | TBD |
+| Member | Student ID |
+|---|---|
+| Zawad Huda | 23102177 |
+| Michael Ang | 24258101 |
+| Dhava Wikhananda Adhi | 24149342 |
+| Hamish Haslam | 24498604 |
+| Yashwardhan Laharia | 24295462 |
 
 ## Project Overview
 
-This repository contains the source code, scripts, testing material,
-technical documentation, and supporting evidence for our CITS3006
-group project.
+Six flags across three exploit chains (network → container root, web → RCE
+→ real root, plus standalone XSS / Oracle / vault legs). See
+`CITS3006-Report.md` for the exploit map, sample solutions, and flag list.
 
 ## Repository Structure
 
-- `src/` - Main project source code (Flask app, challenge workers, VM setup)
-- `scripts/` - Supporting scripts and utilities (`package_app.sh` builds the clean VM app dir, `setup_vm.sh` provisions the whole VM — see `docs/VM.md`)
-- `challenges/` - Standalone CTF services (auth service, vault) + local-account challenges (logic-gate, r2-activation) — not part of the web app
-- `network/` - Docker network lab (FTP/recon, redis, SNMP) + compose boot unit
-- `docs/` - Technical documentation and design notes (`FLAGS.md`, `SOLUTIONS.md`, `VM.md` are authors-only, never ship to the VM)
-- `evidence/` - Screenshots and supporting project evidence
-
-## Team Workflow
-
-1. Create a GitHub Issue for each task.
-2. Assign the Issue to a team member.
-3. Create a branch from `main`.
-4. Complete the work on that branch.
-5. Commit and push the changes.
-6. Open a Pull Request.
-7. Another team member reviews the Pull Request.
-8. Merge the approved Pull Request into `main`.
-
-## Branch Naming
-
-Examples:
-
-- `feature/task-1`
-- `feature/network-scanner`
-- `fix/input-validation`
-- `docs/report`
-- `test/task-2`
-
-## Commit Message Examples
-
-- `feat: add task 1 implementation`
-- `fix: handle invalid input`
-- `docs: update project documentation`
-- `test: add task 1 tests`
-
-## Project Management
-
-Development tasks are tracked using GitHub Issues and the GitHub Project board.
-
-Formal documentation, meeting notes, reports, research, and presentation
-material are stored in the team's shared Google Drive.
+- `src/` - Flask app, challenge workers/bots, VM deployment units
+- `scripts/` - `package_app.sh` builds the clean VM app dir, `setup_vm.sh` provisions the whole VM (see `docs/VM.md`)
+- `challenges/` - Standalone CTF services (auth service, vault) + local-account challenges (logic-gate, r2-activation, horizontals)
+- `network/` - Docker network lab (FTP/recon, redis, SNMP) + compose boot unit + PASV auto-detect
+- `docs/` - Author-only documentation (`FLAGS.md`, `SOLUTIONS.md`, `VM.md` — never ship to the VM)
 
 ## Important
 
