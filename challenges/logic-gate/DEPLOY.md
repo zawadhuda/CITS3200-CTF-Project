@@ -33,5 +33,5 @@ Seed = `((0x5EED * 2) ^ 0x1234) - 0x777 + 42` = `43169`:
 
 ```
 HELIX_SEED=43169 ./logic_gate
-# [+] Seed accepted. Hint: The ops desk never logs out. ...
+# [+] Seed accepted. Hint: The ops desk files its own reports. ...
 ```
