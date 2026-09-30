@@ -13,17 +13,19 @@
 
 The directory lookup is string-built (`email='%s'`). Auth beside it is a
 separate parameterised query, so injection discloses data but never mints
-a session. In-band UNION into the 3-column result card:
+a session. In-band UNION into the 3-column result card — first row is
+Alice, so even the laziest probe lands on the weak account:
 
 ```
-' UNION SELECT password,email,title FROM employees WHERE email='charlie.voss@helix.local' -- 
+' UNION SELECT password,email,title FROM employees -- 
 ```
 
-Charlie's `password` field is `md5(FLAG_WEB_SQLI)` — crackable (the other
-three rows are random). The cracked plaintext is NOT submitted — it is
-just Charlie's password, logging in unlocks the dashboard/`.hpf` stages
-(the dashboard IT #447 note nudges onward). Auth bypass via
-`' OR '1'='1` must NOT work (parameterised) — regression-test this.
+Alice's `password` field is the `md5` of a weak human credential
+(`sunshine`, top-10 wordlist — sub-second crack; the other three rows are
+random). The cracked password is NOT submitted — it just logs in as Alice,
+unlocking the dashboard/`.hpf` stages (the dashboard IT #447 note nudges
+onward). Auth bypass via `' OR '1'='1` must NOT work (parameterised) —
+regression-test this.
 
 ## W2 — insecure deserialisation at `/profile/import` (docker-gated)
 

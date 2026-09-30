@@ -30,7 +30,6 @@ def strong_verify(pw, stored):
         return hashlib.pbkdf2_hmac('sha256', pw.encode(), bytes.fromhex(s), ITER).hex() == h
     except Exception:
         return False
-FLAG_WEB_SQLI = "helix{websqli}"
 
 
 app = Flask(__name__)
@@ -84,13 +83,13 @@ def init_db():
         if cur["n"] == 0:
             def junk():
                 return hashlib.md5(os.urandom(24)).hexdigest()
-            weak = hashlib.md5(FLAG_WEB_SQLI.encode()).hexdigest()
+            weak = hashlib.md5(b"sunshine").hexdigest()
             rows = [
-                ("alice.morgan@helix.local",  junk(), "Dr. Alice Morgan",
+                ("alice.morgan@helix.local",  weak, "Dr. Alice Morgan",
                  "Research Engineer", "RESEARCH"),
                 ("bob.nkemdirim@helix.local", junk(), "Bob Nkemdirim",
                  "Infrastructure Engineer", "RESEARCH"),
-                ("charlie.voss@helix.local",  weak, "Charlie Voss",
+                ("charlie.voss@helix.local",  junk(), "Charlie Voss",
                  "Systems Analyst", "RESEARCH"),
                 ("dana.reid@helix.local",     junk(), "Dana Reid",
                  "Compliance Officer", "RESEARCH"),

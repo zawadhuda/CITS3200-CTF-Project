@@ -27,7 +27,7 @@ Mid-chain wins pay out as cryptic server-taunt nudges, never flags.
 
 | Value | Where it was | What replaced it |
 |---|---|---|
-| `helix{websqli}` | Cracked Charlie password | Still the login password (mechanism unchanged) — no submission; the dashboard IT #447 note nudges onward |
+| `helix{websqli}` (retired) | Was Charlie's cracked password; replaced — Alice's weak credential is now the entry point, no submission |
 | `helix{re_auth-service-backdoor}` | Auth-service grant output | Removed entirely — a grant prints a diagnostics taunt pointing at the next step instead |
 | `FLAG{pcap_h1dd3n_1n_pla1n_s1ght}` | Pcap response comment | Same-length taunt (`MGMT: plaintext never lies, kid.`) — capture stays byte-consistent |
 | `FLAG{r3dis_wr1tes_wh3rever_1t_wants}` | `/home/web-user/flag.txt` | `~/note.txt` nudge toward the SNMP secret, in server voice |

@@ -9,7 +9,7 @@ pip install flask
 python3 app.py          # http://127.0.0.1:5000  (0.0.0.0:5000 on the VM)
 ```
 Seed logins (in `helix.db`, auto-created):
-- alice.morgan@helix.local / Spring2026!
+- alice.morgan@helix.local / sunshine  (weak credential — the intended entry point)
 - Basic Auth for /dev-infra-backup/ : devops / helixbuild2026  (also plant in the FTP PCAP)
 
 ## Pages → challenge hooks
