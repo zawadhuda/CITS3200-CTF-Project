@@ -9,4 +9,6 @@ internal dev-infra notes — do not publish
 - mysqldump cron on the backup box still takes -p on the command line
   instead of a defaults-extra-file. yes, we know. INFRA-511.
 
+- app-cache box ssh (:2222 from the outside) is key-only. everybody over
+  there logs in as web-user, so don't touch its .ssh perms.
 - ping devops if any of this breaks anything, don't just revert.
